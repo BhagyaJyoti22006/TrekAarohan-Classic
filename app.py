@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, render_template
 
 
 def create_app():
@@ -27,7 +27,7 @@ def create_app():
     # Dummy home route
     @app.route("/")
     def home():
-        return "<h1>TAC!</h1>"
+        return render_template("public_home.html")
     return app
 
 

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrekAarohan-Classic</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body style="display: flex; flex-direction: column; min-height: 100vh;">
+
+    <!-- GLOBAL TOP NAV -->
+    <div class="top-navbar">
+        <a href="/" style="text-decoration: none;">
+            <h2 style="margin:0; color: white;">TrekAarohan-Classic</h2>
+        </a>
+        <div class="nav-links" style="display: flex; align-items: center;">
+            <a href="/">Home</a>
+            <a href="#">Browse Treks</a>
+            <a href="#">About Us</a>
+            <a href="#" class="btn btn-outline" style="margin-left: 2rem; padding: 0.4rem 1rem;">Login</a>
+            <a href="#" class="btn btn-accent" style="margin-left: 1rem; padding: 0.5rem 1rem;">Register</a>
+        </div>
+    </div>
+    
+    <div class="public-content" style="flex-grow: 1; background: white; padding: 2rem;">
+        {% block public_content %}{% endblock %}
+    </div>
+
+    <!-- Professional Footer -->
+    <footer class="site-footer">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <p>&copy; 2026 TrekAarohan-Classic. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">Contact Us</a>
+                <span style="margin: 0 0.75rem; color: rgba(255,255,255,0.5);">|</span>
+                <a href="#">Terms & Conditions</a>
+            </div>
+        </div>
+    </footer>
+    
+</body>
+</html>
