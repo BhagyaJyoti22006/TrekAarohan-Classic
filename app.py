@@ -1,5 +1,6 @@
 import os
 from flask import Flask, render_template
+from models import db
 
 
 def create_app():
@@ -23,6 +24,9 @@ def create_app():
     os.makedirs(os.path.join(base_dir, "instance"), exist_ok=True)
     os.makedirs(upload_folder, exist_ok=True)
     os.makedirs(image_folder, exist_ok=True)
+    
+    # Initialize Database
+    db.init_app(app)
     
     # Dummy home route
     @app.route("/")
