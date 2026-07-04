@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block public_content %}
+<div style="display: flex; justify-content: center; padding-top: 2rem; padding-bottom: 4rem;">
+    <div class="card" style="width: 100%; max-width: 500px;">
+        <h3 style="margin-top: 0; text-align: center; color: var(--primary-color);">Join TrekAarohan-Classic</h3>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div style="padding: 0.75rem; margin-bottom: 1rem; border-radius: 6px; background-color: {% if category == 'error' %}#fee2e2{% else %}#dcfce7{% endif %}; color: {% if category == 'error' %}#991b1b{% else %}#166534{% endif %};">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('register') }}">
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="text" name="phone" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label class="form-label">I want to register as a:</label>
+                <select name="role" class="form-control" required>
+                    <option value="0">Trekker (Customer)</option>
+                    <option value="1">Staff Member</option>
+                </select>
+                <small style="color: #666; display: block; margin-top: 0.5rem;">Staff accounts require admin approval before accessing the platform.</small>
+            </div>
+            <button type="submit" class="btn btn-accent" style="width: 100%; padding: 1rem; font-size: 1rem;">Create Account</button>
+        </form>
+        <p style="text-align: center; margin-top: 1.5rem; margin-bottom: 0;">Already have an account? <a href="{{ url_for('login') }}" style="color: var(--primary-color); font-weight: 500;">Sign In</a></p>
+    </div>
+</div>
+{% endblock %}

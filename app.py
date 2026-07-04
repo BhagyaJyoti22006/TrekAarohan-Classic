@@ -1,6 +1,8 @@
 import os
-from flask import Flask, render_template
-from models import db
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from models import db, User
 
 
 def create_app():
@@ -28,10 +30,62 @@ def create_app():
     # Initialize Database
     db.init_app(app)
     
+    # Initialize Auth
+    login_manager = LoginManager()
+    login_manager.login_view = "login"
+    login_manager.init_app(app)
+    
+    @login_manager.user_loader
+    def load_user(user_id):
+        return db.session.get(User, int(user_id))
+    
     # Dummy home route
     @app.route("/")
     def home():
         return render_template("public_home.html")
+    
+    @app.route("/login")
+    def login():
+        return "<h2>Login TAC!</h2>"
+    
+    @app.route("/register", methods=["GET", "POST"])
+    def register():
+        if current_user.is_authenticated:
+            return redirect(url_for("home"))
+        if request.method=="POST":
+            username = request.form.get("username")
+            password = request.form.get("password")
+            name = request.form.get("name")
+            email = request.form.get("email")
+            phone = request.form.get("phone")
+            try:
+                role = int(request.form.get("role", 0))
+            except ValueError:
+                role = 0
+            if role != 1:
+                role = 0
+            user_exists = User.query.filter_by(username=username).first()
+            email_exists = User.query.filter_by(email=email).first()
+            if user_exists:
+                flash("Username already exists.", "error")
+            elif email_exists:
+                flash("Email already registered.", "error")
+            else:
+                new_user = User(
+                    username=username,
+                    password=generate_password_hash(password),
+                    name=name,
+                    email=email,
+                    phone=phone,
+                    role=role,
+                    is_approved=(False if role==1 else True),  # Staff need admin approval
+                )
+                db.session.add(new_user)
+                db.session.commit()
+                flash("Registration successful! Please log in.", "success")
+                return redirect(url_for("login"))
+        return render_template("register.html")
+    
     return app
 
 
