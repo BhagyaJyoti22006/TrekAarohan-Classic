@@ -17,8 +17,18 @@
             <a href="/">Home</a>
             <a href="#">Browse Treks</a>
             <a href="#">About Us</a>
-            <a href="#" class="btn btn-outline" style="margin-left: 2rem; padding: 0.4rem 1rem;">Login</a>
-            <a href="{{ url_for('register') }}" class="btn btn-accent" style="margin-left: 1rem; padding: 0.5rem 1rem;">Register</a>
+            {% if current_user.is_authenticated %}
+                {% if current_user.role == 2 %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline" style="margin-left: 2rem; padding: 0.4rem 1rem;">Dashboard</a>
+                {% elif current_user.role == 1 %}
+                    <a href="{{ url_for('staff_dashboard') }}" class="btn btn-outline" style="margin-left: 2rem; padding: 0.4rem 1rem;">Dashboard</a>
+                {% else %}
+                    <a href="{{ url_for('trekker_dashboard') }}" class="btn btn-outline" style="margin-left: 2rem; padding: 0.4rem 1rem;">Dashboard</a>
+                {% endif %}
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn btn-outline" style="margin-left: 2rem; padding: 0.4rem 1rem;">Login</a>
+                <a href="{{ url_for('register') }}" class="btn btn-accent" style="margin-left: 1rem; padding: 0.5rem 1rem;">Register</a>
+            {% endif %}
         </div>
     </div>
     

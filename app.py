@@ -10,6 +10,7 @@ def create_app():
     
     # Core configuration
     app.config["SECRET_KEY"] = "super-secret-tac-key"
+    app.config["ROLE_MAP"] = {0: "trekker", 1: "staff", 2: "admin"}
     
     # Database configuration
     base_dir = os.path.abspath(os.path.dirname(__file__))
@@ -39,14 +40,55 @@ def create_app():
     def load_user(user_id):
         return db.session.get(User, int(user_id))
     
+    
     # Dummy home route
     @app.route("/")
     def home():
         return render_template("public_home.html")
     
-    @app.route("/login")
+    
+    # Dummy Dashboards
+    @app.route("/admin/dashboard")
+    @login_required
+    def admin_dashboard():
+        return "<h2>Admin Dashboard</h2>"
+    
+    @app.route("/staff/dashboard")
+    @login_required
+    def staff_dashboard():
+        return "<h2>Staff Dashboard</h2>"
+    
+    @app.route("/trekker/dashboard")
+    @login_required
+    def trekker_dashboard():
+        return "<h2>Trekker Dashboard</h2>"
+    
+    
+    @app.route("/login", methods=["GET", "POST"])
     def login():
-        return "<h2>Login TAC!</h2>"
+        if current_user.is_authenticated:
+            role_name = app.config["ROLE_MAP"].get(current_user.role, "trekker")
+            return redirect(url_for(f"{role_name}_dashboard"))
+        if request.method == "POST":
+            username = request.form.get("username")
+            password = request.form.get("password")
+            user = User.query.filter_by(username=username).first()
+            if user and check_password_hash(user.password, password):
+                if user.role == 1 and not user.is_approved:
+                    flash("Your staff account is pending admin approval.", "error")
+                    return redirect(url_for("login"))
+                login_user(user)
+                role_name = app.config["ROLE_MAP"].get(user.role, "trekker")
+                return redirect(url_for(f"{role_name}_dashboard"))
+            flash("Invalid username or password", "error")
+        return render_template("login.html")
+    
+    @app.route("/logout")
+    @login_required
+    def logout():
+        logout_user()
+        flash("You have been logged out.", "success")
+        return redirect(url_for("home"))
     
     @app.route("/register", methods=["GET", "POST"])
     def register():
