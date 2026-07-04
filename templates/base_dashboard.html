@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block main_container %}
+<div style="display: flex; flex-grow: 1;">
+    <!-- Sidepane -->
+    <div class="sidebar">
+        
+        <!-- Top Aligned Nav Buttons (Injected by specific roles) -->
+        <div class="sidebar-links">
+            {% block sidebar_top %}
+            {% endblock %}
+        </div>
+        
+        <!-- Bottom Aligned Logout Button -->
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('logout') }}">Log out</a>
+        </div>
+    </div>
+    
+    <!-- Main Right Content -->
+    <div style="flex-grow: 1; background: white; padding: 2.5rem; overflow-y: auto;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div style="padding: 0.75rem; margin-bottom: 1.5rem; border-radius: 6px; background-color: {% if category == 'error' %}#fee2e2{% else %}#dcfce7{% endif %}; color: {% if category == 'error' %}#991b1b{% else %}#166534{% endif %};">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block dashboard_content %}
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<!-- No footer for dashboard -->
+{% endblock %}

@@ -51,17 +51,17 @@ def create_app():
     @app.route("/admin/dashboard")
     @login_required
     def admin_dashboard():
-        return "<h2>Admin Dashboard</h2>"
+        return render_template("admin_dashboard.html")
     
     @app.route("/staff/dashboard")
     @login_required
     def staff_dashboard():
-        return "<h2>Staff Dashboard</h2>"
+        return render_template("staff_dashboard.html")
     
     @app.route("/trekker/dashboard")
     @login_required
     def trekker_dashboard():
-        return "<h2>Trekker Dashboard</h2>"
+        return render_template("trekker_dashboard.html")
     
     
     @app.route("/login", methods=["GET", "POST"])

@@ -1,0 +1,16 @@
+{% extends "base_dashboard.html" %}
+
+{% block sidebar_top %}
+    <a href="#" class="active">Admin Overview</a>
+    <a href="#">Manage Staff</a>
+    <a href="#">Manage Treks</a>
+{% endblock %}
+
+{% block dashboard_content %}
+    <h2 style="color: var(--primary-color);">Welcome to your Dashboard</h2>
+    <p>You are logged in as an <strong>Administrator</strong>.</p>
+    <div class="card" style="margin-top: 2rem;">
+        <h4>Admin Controls Placeholder</h4>
+        <p>This is where staff approvals and global trek management will go.</p>
+    </div>
+{% endblock %}

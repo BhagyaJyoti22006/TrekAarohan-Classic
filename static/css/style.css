@@ -121,3 +121,49 @@ h1, h2 {
 select.form-control {
     background-color: white;
 }
+
+/* Sidebar for Dashboards */
+.sidebar {
+    width: 250px;
+    background-color: var(--primary-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+.sidebar-links {
+    display: flex;
+    flex-direction: column;
+    padding-top: 1rem;
+}
+.sidebar-links a {
+    color: white;
+    text-decoration: none;
+    padding: 1rem 1.5rem;
+    opacity: 0.8;
+    display: block;
+    box-sizing: border-box;
+}
+.sidebar-links a:hover, .sidebar-links a.active {
+    background-color: rgba(0,0,0,0.2);
+    opacity: 1;
+    border-left: 4px solid var(--accent-color);
+    padding-left: calc(1.5rem - 4px); /* Keep text aligned */
+}
+.sidebar-bottom {
+    padding: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+.sidebar-bottom a {
+    color: white;
+    text-decoration: none;
+    padding: 0.75rem 1.5rem;
+    display: block;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.5);
+    transition: all 0.2s;
+}
+.sidebar-bottom a:hover {
+    background-color: rgba(255,255,255,0.1);
+    border-color: white;
+}
