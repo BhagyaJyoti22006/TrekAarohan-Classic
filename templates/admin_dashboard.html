@@ -1,16 +1,10 @@
-{% extends "base_dashboard.html" %}
-
-{% block sidebar_top %}
-    <a href="#" class="active">Admin Overview</a>
-    <a href="#">Manage Staff</a>
-    <a href="#">Manage Treks</a>
-{% endblock %}
+{% extends "admin_base.html" %}
+{% set active_page = "dashboard" %}
 
 {% block dashboard_content %}
-    <h2 style="color: var(--primary-color);">Welcome to your Dashboard</h2>
-    <p>You are logged in as an <strong>Administrator</strong>.</p>
+    <h2>TAC Overview</h2>
     <div class="card" style="margin-top: 2rem;">
-        <h4>Admin Controls Placeholder</h4>
-        <p>This is where staff approvals and global trek management will go.</p>
+        <h4>Platform Statistics Placeholder</h4>
+        <p>This is where global stats like total treks and revenue will be displayed.</p>
     </div>
 {% endblock %}

@@ -41,23 +41,47 @@ def create_app():
         return db.session.get(User, int(user_id))
     
     
-    # Dummy home route
+    # Home Route
     @app.route("/")
     def home():
         return render_template("public_home.html")
     
     
-    # Dummy Dashboards
+    # Admin Dashboard
     @app.route("/admin/dashboard")
     @login_required
     def admin_dashboard():
         return render_template("admin_dashboard.html")
     
+    @app.route("/admin/treks")
+    @login_required
+    def admin_treks():
+        return render_template("admin_treks.html")
+    
+    @app.route("/admin/staffs")
+    @login_required
+    def admin_staffs():
+        return render_template("admin_staffs.html")
+    
+    @app.route("/admin/trekkers")
+    @login_required
+    def admin_trekkers():
+        return render_template("admin_trekkers.html")
+    
+    @app.route("/admin/bookings")
+    @login_required
+    def admin_bookings():
+        return render_template("admin_bookings.html")
+    
+    
+    # Staff Dashboard
     @app.route("/staff/dashboard")
     @login_required
     def staff_dashboard():
         return render_template("staff_dashboard.html")
     
+    
+    # Trekker Dashboard
     @app.route("/trekker/dashboard")
     @login_required
     def trekker_dashboard():
