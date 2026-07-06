@@ -7,6 +7,40 @@
         <a href="{{ url_for('admin_treks_add') }}" class="btn btn-accent">+ Add New Trek</a>
     </div>
 
+    <!-- Search & Filter Toolbar -->
+    <div class="card" style="margin-bottom: 2rem; padding: 1.5rem;">
+        <form method="GET" action="{{ url_for('admin_treks') }}" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+            <div style="flex: 2; min-width: 250px;">
+                <label for="q" class="form-label">Search by Name or Location</label>
+                <input type="text" id="q" name="q" class="form-control" value="{{ current_q }}" placeholder="e.g. Leh, Ladakh...">
+            </div>
+            <div style="flex: 1; min-width: 150px;">
+                <label for="difficulty" class="form-label">Difficulty</label>
+                <select id="difficulty" name="difficulty" class="form-control">
+                    <option value="">All Difficulties</option>
+                    <option value="easy" {% if current_difficulty == 'easy' %}selected{% endif %}>Easy</option>
+                    <option value="medium" {% if current_difficulty == 'medium' %}selected{% endif %}>Medium</option>
+                    <option value="hard" {% if current_difficulty == 'hard' %}selected{% endif %}>Hard</option>
+                </select>
+            </div>
+            <div style="flex: 1; min-width: 150px;">
+                <label for="status" class="form-label">Status</label>
+                <select id="status" name="status" class="form-control">
+                    <option value="">All Statuses</option>
+                    <option value="open" {% if current_status == 'open' %}selected{% endif %}>Open</option>
+                    <option value="full" {% if current_status == 'full' %}selected{% endif %}>Full</option>
+                    <option value="ongoing" {% if current_status == 'ongoing' %}selected{% endif %}>Ongoing</option>
+                    <option value="completed" {% if current_status == 'completed' %}selected{% endif %}>Completed</option>
+                    <option value="cancelled" {% if current_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 0.5rem; flex: 1; min-width: 150px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Filter</button>
+                <a href="{{ url_for('admin_treks') }}" class="btn btn-secondary" style="flex: 1; text-align: center;">Clear</a>
+            </div>
+        </form>
+    </div>
+
     <div class="data-table-wrapper">
         <table class="data-table">
             <thead>

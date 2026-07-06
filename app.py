@@ -64,8 +64,20 @@ def create_app():
     @app.route("/admin/treks")
     @login_required
     def admin_treks():
-        treks = Trek.query.order_by(Trek.id.desc()).all()
-        return render_template("admin_treks.html", treks=treks)
+        if current_user.role != 2:
+            return redirect(url_for("home"))
+        q = request.args.get("q", "").strip()
+        difficulty = request.args.get("difficulty", "")
+        status = request.args.get("status", "")
+        query = Trek.query
+        if q:
+            query = query.filter(db.or_(Trek.name.ilike(f"%{q}%"), Trek.location.ilike(f"%{q}%")))
+        if difficulty:
+            query = query.filter(Trek.difficulty == difficulty)
+        if status:
+            query = query.filter(Trek.status == status)
+        treks = query.order_by(Trek.id.desc()).all()
+        return render_template("admin_treks.html", treks=treks, current_q=q, current_difficulty=difficulty, current_status=status)
         
     @app.route("/admin/treks/add", methods=["GET", "POST"])
     @login_required
