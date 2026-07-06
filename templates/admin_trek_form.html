@@ -1,0 +1,104 @@
+{% extends "admin_base.html" %}
+{% set active_page = "treks" %}
+
+{% block dashboard_content %}
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    <div style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+        <h3 style="margin: 0; color: var(--primary-color);">{{ 'Edit Trek: ' ~ trek.name if trek else 'Create New Trek' }}</h3>
+    </div>
+    
+    <form method="POST" action="{{ url_for('admin_treks_edit', id=trek.id) if trek else url_for('admin_treks_add') }}" enctype="multipart/form-data">
+        <div style="display: flex; gap: 1.5rem; margin-bottom: 1rem;">
+            <div class="form-group" style="flex: 2; margin-bottom: 0;">
+                <label class="form-label">Trek Name</label>
+                <input type="text" name="name" class="form-control" value="{{ trek.name if trek else '' }}" required>
+            </div>
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label class="form-label">Location</label>
+                <input type="text" name="location" class="form-control" value="{{ trek.location if trek else '' }}" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control" rows="4" style="resize: vertical;">{{ trek.description if trek else '' }}</textarea>
+        </div>
+        
+        <div style="display: flex; gap: 1.5rem; margin-bottom: 1rem;">
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label class="form-label">Start Date</label>
+                <input type="date" name="start_date" class="form-control" value="{{ trek.start_date.strftime('%Y-%m-%d') if trek else '' }}" required>
+            </div>
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label class="form-label">End Date</label>
+                <input type="date" name="end_date" class="form-control" value="{{ trek.end_date.strftime('%Y-%m-%d') if trek else '' }}" required>
+            </div>
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label class="form-label">Cover Image</label>
+                <input type="file" name="cover_image" class="form-control" accept="image/*">
+                {% if trek and trek.cover_image %}
+                    <small style="color: var(--secondary-color); margin-top: 0.5rem; display: block;">Current: {{ trek.cover_image }}</small>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1.5rem; margin-bottom: 1rem;">
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label class="form-label">Difficulty</label>
+                <select name="difficulty" class="form-control" required>
+                    <option value="" disabled {% if not trek %}selected{% endif %}>Select Difficulty</option>
+                    <option value="easy" {% if trek and trek.difficulty == 'easy' %}selected{% endif %}>Easy</option>
+                    <option value="medium" {% if trek and trek.difficulty == 'medium' %}selected{% endif %}>Medium</option>
+                    <option value="hard" {% if trek and trek.difficulty == 'hard' %}selected{% endif %}>Hard</option>
+                </select>
+            </div>
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label class="form-label">Slots Available</label>
+                <input type="number" name="slots_available" class="form-control" min="0" value="{{ trek.slots_available if trek else '' }}" required>
+            </div>
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label class="form-label">Price ($)</label>
+                <input type="number" name="price" class="form-control" min="0" step="0.01" value="{{ trek.price if trek else '' }}" required>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1.5rem; margin-bottom: 1rem;">
+            <div class="form-group" style="flex: 2; margin-bottom: 0;">
+                <label class="form-label">Assign Staff Member</label>
+                <select name="assigned_staff_id" class="form-control" required>
+                    <option value="" disabled {% if not trek %}selected{% endif %}>Select an approved staff</option>
+                    {% for s in staff %}
+                        <option value="{{ s.id }}" {% if trek and trek.assigned_staff_id == s.id %}selected{% endif %}>
+                            {{ s.name }} ({{ s.username }})
+                            {% if s.is_blacklisted %} [BLACKLISTED] 
+                            {% endif %}
+                        </option>
+                    {% else %}
+                        <option value="" disabled>No approved staff available</option>
+                    {% endfor %}
+                </select>
+                <small style="color: var(--secondary-color); margin-top: 0.5rem; display: block;">Only approved and active staffs shown.</small>
+            </div>
+            
+            {% if trek %}
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-control" required>
+                    <option value="open" {% if trek.status == 'open' %}selected{% endif %}>Open</option>
+                    <option value="ongoing" {% if trek.status == 'ongoing' %}selected{% endif %}>Ongoing</option>
+                    <option value="full" {% if trek.status == 'full' %}selected{% endif %}>Full</option>
+                    <option value="completed" {% if trek.status == 'completed' %}selected{% endif %}>Completed</option>
+                    <option value="cancelled" {% if trek.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+                <small style="color: var(--secondary-color); margin-top: 0.5rem; display: block;">May auto-update.</small>
+            </div>
+            {% endif %}
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+            <a href="{{ url_for('admin_treks') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">{{ 'Save Changes' if trek else 'Create Trek' }}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

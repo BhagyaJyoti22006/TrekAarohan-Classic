@@ -108,7 +108,49 @@ def create_app():
             flash("Trek created successfully!", "success")
             return redirect(url_for("admin_treks"))
         staff = User.query.filter_by(role=1, is_approved=True, is_blacklisted=False).all()
-        return render_template("admin_treks_add.html", staff=staff)
+        return render_template("admin_trek_form.html", trek=None, staff=staff)
+        
+    @app.route("/admin/treks/edit/<int:id>", methods=["GET", "POST"])
+    @login_required
+    def admin_treks_edit(id):
+        if current_user.role != 2:
+            return redirect(url_for("home"))
+        trek = Trek.query.get_or_404(id)
+        if request.method == "POST":
+            trek.name = request.form.get("name")
+            trek.location = request.form.get("location")
+            trek.description = request.form.get("description")
+            trek.difficulty = request.form.get("difficulty")
+            slots_available = int(request.form.get("slots_available", 0))
+            trek.price = float(request.form.get("price", 0.0))
+            trek.assigned_staff_id = int(request.form.get("assigned_staff_id"))
+            # Status & Slots logic
+            new_status = request.form.get("status")
+            if new_status == "full" or (new_status == "open" and slots_available == 0):
+                trek.status = "full"
+                trek.slots_available = 0
+            else:
+                trek.status = new_status
+                trek.slots_available = slots_available
+            try:
+                trek.start_date = datetime.strptime(request.form.get("start_date"), "%Y-%m-%d").date()
+                trek.end_date = datetime.strptime(request.form.get("end_date"), "%Y-%m-%d").date()
+            except (ValueError, TypeError):
+                flash("Invalid date format.", "error")
+                return redirect(request.url)
+            file = request.files.get("cover_image")
+            if file and file.filename != "":
+                filename = f"{trek.id}-{secure_filename(file.filename)}"
+                file.save(os.path.join(app.config["IMAGE_FOLDER"], filename))
+                trek.cover_image = filename
+            db.session.commit()
+            flash("Trek updated successfully!", "success")
+            return redirect(url_for("admin_treks"))
+        staff = User.query.filter_by(role=1, is_approved=True, is_blacklisted=False).all()
+        assigned_staff = User.query.get(trek.assigned_staff_id)
+        if assigned_staff and assigned_staff not in staff:
+            staff.append(assigned_staff)
+        return render_template("admin_trek_form.html", trek=trek, staff=staff)
     
     @app.route("/admin/staffs")
     @login_required
