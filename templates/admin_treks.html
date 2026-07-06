@@ -2,9 +2,53 @@
 {% set active_page = "treks" %}
 
 {% block dashboard_content %}
-    <h2>Manage Treks</h2>
-    <div class="card" style="margin-top: 2rem;">
-        <h4>Trek Inventory Placeholder</h4>
-        <p>This is where the admin will view, add, and edit treks.</p>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2 style="margin: 0;">Manage Treks</h2>
+        <a href="{{ url_for('admin_treks_add') }}" class="btn btn-accent">+ Add New Trek</a>
+    </div>
+
+    <div class="data-table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Dates</th>
+                    <th>Difficulty</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trek in treks %}
+                <tr>
+                    <td><strong>#{{ trek.id }}</strong></td>
+                    <td><strong>{{ trek.name }}</strong></td>
+                    <td>{{ trek.location }}</td>
+                    <td>
+                        {{ trek.start_date.strftime('%b %d, %Y') }} - {{ trek.end_date.strftime('%b %d, %Y') }}<br>
+                        <small style="color: var(--secondary-color);">({{ (trek.end_date - trek.start_date).days }} Days)</small>
+                    </td>
+                    <td>
+                        <span style="text-transform: capitalize;">{{ trek.difficulty }}</span>
+                    </td>
+                    <td>
+                        <span class="badge badge-{{ trek.status }}">{{ trek.status|capitalize }}</span>
+                    </td>
+                    <td>
+                        <a href="#" class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin-right: 0.25rem;">Edit</a>
+                        <a href="{{ url_for('public_trek_detail', id=trek.id) }}" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">Show</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 2rem; color: var(--secondary-color);">
+                        No treks found. Click "+ Add New Trek" to create one.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% endblock %}

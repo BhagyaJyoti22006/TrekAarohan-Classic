@@ -56,6 +56,12 @@ h1, h2 {
     border-color: white;
 }
 
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+.btn-primary:hover { background-color: #1A3622; }
+
 .btn-danger {
     background-color: var(--danger-color);
     color: white;

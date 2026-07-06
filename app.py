@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User
+from models import db, User, Trek, Booking
 
 
 def create_app():
@@ -46,6 +46,10 @@ def create_app():
     def home():
         return render_template("public_home.html")
     
+    @app.route("/trek/<int:id>")
+    def public_trek_detail(id):
+        return "Trek Details TAC!"
+    
     
     # Admin Dashboard
     @app.route("/admin/dashboard")
@@ -56,7 +60,13 @@ def create_app():
     @app.route("/admin/treks")
     @login_required
     def admin_treks():
-        return render_template("admin_treks.html")
+        treks = Trek.query.order_by(Trek.id.desc()).all()
+        return render_template("admin_treks.html", treks=treks)
+        
+    @app.route("/admin/treks/add", methods=["GET", "POST"])
+    @login_required
+    def admin_treks_add():
+        return "Add Trek to TAC!"
     
     @app.route("/admin/staffs")
     @login_required
