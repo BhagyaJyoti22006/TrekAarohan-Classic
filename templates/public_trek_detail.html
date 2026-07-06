@@ -6,14 +6,17 @@
     <a href="{{ url_for('home') }}" style="color: var(--secondary-color); text-decoration: none; display: inline-block; margin-bottom: 1rem;">&larr; Back to Treks</a>
     
     <div class="card" style="padding: 0; overflow: hidden;">
-        {% set img = trek.cover_image if trek.cover_image else 'trek.jpg' %}
-        <div style="height: 450px; background-image: url('{{ url_for('static', filename='images/' ~ img) }}'); background-size: cover; background-position: center;"></div>
+        {% if trek.cover_image %}
+            <div style="height: 450px; background-image: url('{{ url_for('static', filename='uploads/' ~ trek.cover_image) }}'); background-size: cover; background-position: center;"></div>
+        {% else %}
+            <div style="height: 450px; background-image: url('{{ url_for('static', filename='images/trek.jpg') }}'); background-size: cover; background-position: center;"></div>
+        {% endif %}
         
         <div style="padding: 2.5rem;">
             <!-- Header & Price -->
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
                 <h1 style="margin: 0; color: var(--text-color); font-size: 2.5rem;">{{ trek.name }}</h1>
-                <h2 style="margin: 0; color: var(--primary-color); font-size: 2rem;">${{ "%.2f"|format(trek.price) }}</h2>
+                <h2 style="margin: 0; color: var(--primary-color); font-size: 2rem;">₹{{ "%.2f"|format(trek.price) }}</h2>
             </div>
             
             <!-- Badges -->

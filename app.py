@@ -51,7 +51,7 @@ def create_app():
     @app.route("/trek/<int:id>")
     def public_trek_detail(id):
         trek = Trek.query.get_or_404(id)
-        staff_completed_treks = Trek.query.filter_by(assigned_staff_id=trek.assigned_staff_id, status='completed').count()
+        staff_completed_treks = Trek.query.filter_by(assigned_staff_id=trek.assigned_staff_id, status="completed").count()
         return render_template("public_trek_detail.html", trek=trek, staff_completed_treks=staff_completed_treks)
     
     
@@ -78,7 +78,7 @@ def create_app():
             query = query.filter(Trek.status == status)
         treks = query.order_by(Trek.id.desc()).all()
         return render_template("admin_treks.html", treks=treks, current_q=q, current_difficulty=difficulty, current_status=status)
-        
+    
     @app.route("/admin/treks/add", methods=["GET", "POST"])
     @login_required
     def admin_treks_add():
@@ -116,14 +116,14 @@ def create_app():
             file = request.files.get("cover_image")
             if file and file.filename != "":
                 filename = f"{new_trek.id}-{secure_filename(file.filename)}"
-                file.save(os.path.join(app.config["IMAGE_FOLDER"], filename))
+                file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
                 new_trek.cover_image = filename
             db.session.commit()
             flash("Trek created successfully!", "success")
             return redirect(url_for("admin_treks"))
         staff = User.query.filter_by(role=1, is_approved=True, is_blacklisted=False).all()
         return render_template("admin_trek_form.html", trek=None, staff=staff)
-        
+    
     @app.route("/admin/treks/edit/<int:id>", methods=["GET", "POST"])
     @login_required
     def admin_treks_edit(id):
@@ -155,14 +155,14 @@ def create_app():
             file = request.files.get("cover_image")
             if file and file.filename != "":
                 filename = f"{trek.id}-{secure_filename(file.filename)}"
-                file.save(os.path.join(app.config["IMAGE_FOLDER"], filename))
+                file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
                 trek.cover_image = filename
             db.session.commit()
             flash("Trek updated successfully!", "success")
             return redirect(url_for("admin_treks"))
         staff = User.query.filter_by(role=1, is_approved=True, is_blacklisted=False).all()
         assigned_staff = User.query.get(trek.assigned_staff_id)
-        if assigned_staff and assigned_staff not in staff:
+        if assigned_staff not in staff:
             staff.append(assigned_staff)
         return render_template("admin_trek_form.html", trek=trek, staff=staff)
     
@@ -171,7 +171,7 @@ def create_app():
     def admin_staffs():
         staffs = User.query.filter_by(role=1).all()
         return render_template("admin_staffs.html", staffs=staffs)
-        
+    
     @app.route("/admin/staffs/<int:id>/<action>")
     @login_required
     def admin_staffs_action(id, action):
@@ -204,7 +204,7 @@ def create_app():
     def admin_trekkers():
         trekkers = User.query.filter_by(role=0).all()
         return render_template("admin_trekkers.html", trekkers=trekkers)
-        
+    
     @app.route("/admin/trekkers/<int:id>/<action>")
     @login_required
     def admin_trekkers_action(id, action):
