@@ -50,7 +50,9 @@ def create_app():
     
     @app.route("/trek/<int:id>")
     def public_trek_detail(id):
-        return "Trek Details TAC!"
+        trek = Trek.query.get_or_404(id)
+        staff_completed_treks = Trek.query.filter_by(assigned_staff_id=trek.assigned_staff_id, status='completed').count()
+        return render_template("public_trek_detail.html", trek=trek, staff_completed_treks=staff_completed_treks)
     
     
     # Admin Dashboard

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% set active_page = "treks" %}
+
+{% block public_content %}
+<div class="container" style="max-width: 900px; margin: 0 auto; padding: 2rem 1rem 4rem 1rem;">
+    <a href="{{ url_for('home') }}" style="color: var(--secondary-color); text-decoration: none; display: inline-block; margin-bottom: 1rem;">&larr; Back to Treks</a>
+    
+    <div class="card" style="padding: 0; overflow: hidden;">
+        {% set img = trek.cover_image if trek.cover_image else 'trek.jpg' %}
+        <div style="height: 450px; background-image: url('{{ url_for('static', filename='images/' ~ img) }}'); background-size: cover; background-position: center;"></div>
+        
+        <div style="padding: 2.5rem;">
+            <!-- Header & Price -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <h1 style="margin: 0; color: var(--text-color); font-size: 2.5rem;">{{ trek.name }}</h1>
+                <h2 style="margin: 0; color: var(--primary-color); font-size: 2rem;">${{ "%.2f"|format(trek.price) }}</h2>
+            </div>
+            
+            <!-- Badges -->
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+                <span class="badge badge-active" style="font-size: 1rem; padding: 0.5rem 1rem; background-color: var(--primary-color); color: white;">{{ trek.difficulty|capitalize }} Difficulty</span>
+                <span class="badge badge-open" style="font-size: 1rem; padding: 0.5rem 1rem;">📍 {{ trek.location }}</span>
+                <span class="badge badge-open" style="font-size: 1rem; padding: 0.5rem 1rem;">🧑‍🤝‍🧑 {{ trek.slots_available }} Slots Left</span>
+                <span class="badge badge-{{ trek.status }}" style="font-size: 1rem; padding: 0.5rem 1rem; margin-left: auto;">{{ trek.status|capitalize }}</span>
+            </div>
+            
+            <!-- Dates Row -->
+            <div style="display: flex; gap: 4rem; margin-bottom: 2.5rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border-color);">
+                <div>
+                    <strong style="color: var(--secondary-color); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Start Date</strong>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; font-weight: 500;">{{ trek.start_date.strftime('%B %d, %Y') }}</p>
+                </div>
+                <div>
+                    <strong style="color: var(--secondary-color); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">End Date</strong>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; font-weight: 500;">{{ trek.end_date.strftime('%B %d, %Y') }}</p>
+                </div>
+                <div>
+                    <strong style="color: var(--secondary-color); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Duration</strong>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; font-weight: 500;">{{ (trek.end_date - trek.start_date).days + 1 }} Days</p>
+                </div>
+            </div>
+            
+            <!-- Description & Staff Grid -->
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 3rem;">
+                <div>
+                    <h3 style="margin-top: 0; font-size: 1.5rem;">About This Trek</h3>
+                    <div style="line-height: 1.8; color: var(--text-color); font-size: 1.05rem; white-space: pre-wrap;">{{ trek.description or 'No description provided.' }}</div>
+                </div>
+                
+                <div>
+                    <h3 style="margin-top: 0; font-size: 1.5rem;">Your Guide</h3>
+                    <h4 style="margin: 0 0 0.5rem 0; font-size: 1.2rem; color: var(--primary-color);">{{ trek.staff.name }}</h4>
+                    <p style="margin: 0 0 1rem 0; font-weight: bold; color: var(--text-color);">{{ staff_completed_treks }} Past Treks Completed</p>
+                    <p style="margin: 0; color: var(--secondary-color); font-size: 0.95rem; line-height: 1.6;">
+                        {{ trek.staff.experience or 'An experienced guide ready to lead you on this adventure.' }}
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Call to Action -->
+            <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border-color); text-align: center;">
+                {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('login') }}" class="btn btn-primary" style="padding: 1rem 4rem; font-size: 1.2rem;">Log in to Book</a>
+                {% elif current_user.role != 0 %}
+                    <div class="badge badge-inactive" style="padding: 1rem 4rem; font-size: 1.2rem; background-color: var(--secondary-color); color: white;">Only Trekkers can book</div>
+                {% elif trek.status == 'full' %}
+                    <div class="badge badge-inactive" style="padding: 1rem 4rem; font-size: 1.2rem; background-color: #ef4444; color: white;">Sold Out</div>
+                {% elif trek.status != 'open' %}
+                    <div class="badge badge-inactive" style="padding: 1rem 4rem; font-size: 1.2rem; background-color: var(--primary-color); color: white;">Booking Closed ({{ trek.status|capitalize }})</div>
+                {% else %}
+                    <form method="POST" action="#" style="display: inline-block;">
+                        <button type="submit" class="btn btn-accent" style="padding: 1rem 4rem; font-size: 1.2rem; border-radius: 8px;">Book This Trek</button>
+                    </form>
+                {% endif %}
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
