@@ -8,6 +8,14 @@
 {% block dashboard_content %}
     <h2 style="color: var(--primary-color);">Welcome to your Dashboard</h2>
     <p>You are logged in as a <strong>Staff Member</strong>.</p>
+    
+    {% if current_user.is_blacklisted %}
+    <div style="background-color: #fef2f2; color: #991b1b; padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem; margin-bottom: 2rem; border: 1px solid #fecaca; text-align: center;">
+        <h3 style="margin-top: 0; color: #7f1d1d;">⚠️ Account Suspended</h3>
+        <p style="margin-bottom: 0;">Your account has been blacklisted. You can still view and manage your previously assigned treks, but you will not be assigned any new treks. If you believe this is an error, please contact an administrator.</p>
+    </div>
+    {% endif %}
+
     <div class="card" style="margin-top: 2rem;">
         <h4>Staff Operations Placeholder</h4>
         <p>This is where assigned treks and customer management will go.</p>

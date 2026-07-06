@@ -3,8 +3,61 @@
 
 {% block dashboard_content %}
     <h2>Manage Staffs</h2>
-    <div class="card" style="margin-top: 2rem;">
-        <h4>Staff Approval Placeholder</h4>
-        <p>This is where pending staff will be approved and current staff managed.</p>
+    <div class="data-table-wrapper" style="margin-top: 2rem;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Experience</th>
+                    <th>Total Treks</th>
+                    <th>Approval</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in staffs %}
+                <tr>
+                    <td>{{ s.name }}</td>
+                    <td>{{ s.username }}</td>
+                    <td>{{ s.email }}</td>
+                    <td>{{ s.phone }}</td>
+                    <td>{{ s.experience if s.experience else "" }}</td>
+                    <td style="text-align: center;"><strong>{{ s.assigned_treks|length }}</strong></td>
+                    <td>
+                        {% if s.is_approved %}
+                            <span class="badge badge-approved">Approved</span>
+                        {% else %}
+                            <span class="badge badge-pending">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if s.is_blacklisted %}
+                            <span class="badge badge-blacklisted">Blacklisted</span>
+                        {% else %}
+                            <span class="badge badge-active">Active</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not s.is_approved %}
+                            <a href="{{ url_for('admin_staffs_action', id=s.id, action='approve') }}" class="btn btn-success" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin-right: 0.25rem;">Approve</a>
+                            <a href="{{ url_for('admin_staffs_action', id=s.id, action='reject') }}" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="return confirm('Are you sure you want to reject and delete this application?');">Reject</a>
+                        {% else %}
+                            {% if s.is_blacklisted %}
+                                <a href="{{ url_for('admin_staffs_action', id=s.id, action='unblacklist') }}" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">Un-blacklist</a>
+                            {% else %}
+                                <a href="{{ url_for('admin_staffs_action', id=s.id, action='blacklist') }}" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="return confirm('Blacklist this staff member?');">Blacklist</a>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" style="text-align: center; color: var(--secondary-color);">No staff members found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% endblock %}

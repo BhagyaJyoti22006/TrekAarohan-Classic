@@ -61,7 +61,35 @@ def create_app():
     @app.route("/admin/staffs")
     @login_required
     def admin_staffs():
-        return render_template("admin_staffs.html")
+        staffs = User.query.filter_by(role=1).all()
+        return render_template("admin_staffs.html", staffs=staffs)
+        
+    @app.route("/admin/staffs/<int:id>/<action>")
+    @login_required
+    def admin_staffs_action(id, action):
+        if current_user.role != 2:
+            return redirect(url_for("home"))
+        staff_user = User.query.get_or_404(id)
+        if staff_user.role != 1:
+            flash("Invalid user role for this action.", "error")
+            return redirect(url_for("admin_staffs"))
+        if action == "approve":
+            staff_user.is_approved = True
+            db.session.commit()
+            flash(f"Staff {staff_user.name} approved successfully.", "success")
+        elif action == "reject":
+            db.session.delete(staff_user)
+            db.session.commit()
+            flash(f"Staff application for {staff_user.name} rejected.", "success")
+        elif action == "blacklist":
+            staff_user.is_blacklisted = True
+            db.session.commit()
+            flash(f"Staff {staff_user.name} has been blacklisted.", "error")
+        elif action == "unblacklist":
+            staff_user.is_blacklisted = False
+            db.session.commit()
+            flash(f"Staff {staff_user.name} has been restored.", "success")
+        return redirect(url_for("admin_staffs"))
     
     @app.route("/admin/trekkers")
     @login_required
@@ -88,6 +116,13 @@ def create_app():
         return render_template("trekker_dashboard.html")
     
     
+    @app.route("/logout")
+    @login_required
+    def logout():
+        logout_user()
+        flash("You have been logged out.", "success")
+        return redirect(url_for("home"))
+    
     @app.route("/login", methods=["GET", "POST"])
     def login():
         if current_user.is_authenticated:
@@ -106,13 +141,6 @@ def create_app():
                 return redirect(url_for(f"{role_name}_dashboard"))
             flash("Invalid username or password", "error")
         return render_template("login.html")
-    
-    @app.route("/logout")
-    @login_required
-    def logout():
-        logout_user()
-        flash("You have been logged out.", "success")
-        return redirect(url_for("home"))
     
     @app.route("/register", methods=["GET", "POST"])
     def register():
