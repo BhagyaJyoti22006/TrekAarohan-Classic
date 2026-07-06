@@ -94,7 +94,27 @@ def create_app():
     @app.route("/admin/trekkers")
     @login_required
     def admin_trekkers():
-        return render_template("admin_trekkers.html")
+        trekkers = User.query.filter_by(role=0).all()
+        return render_template("admin_trekkers.html", trekkers=trekkers)
+        
+    @app.route("/admin/trekkers/<int:id>/<action>")
+    @login_required
+    def admin_trekkers_action(id, action):
+        if current_user.role != 2:
+            return redirect(url_for("home"))
+        trekker = User.query.get_or_404(id)
+        if trekker.role != 0:
+            flash("Invalid user role for this action.", "error")
+            return redirect(url_for("admin_trekkers"))
+        if action == "blacklist":
+            trekker.is_blacklisted = True
+            db.session.commit()
+            flash(f"Trekker {trekker.name} has been blacklisted.", "error")
+        elif action == "unblacklist":
+            trekker.is_blacklisted = False
+            db.session.commit()
+            flash(f"Trekker {trekker.name} has been restored.", "success")
+        return redirect(url_for("admin_trekkers"))
     
     @app.route("/admin/bookings")
     @login_required

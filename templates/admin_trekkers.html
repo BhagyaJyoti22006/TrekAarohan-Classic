@@ -3,8 +3,51 @@
 
 {% block dashboard_content %}
     <h2>Manage Trekkers</h2>
-    <div class="card" style="margin-top: 2rem;">
-        <h4>Trekkers Directory Placeholder</h4>
-        <p>This is where the admin can view and manage all registered trekkers.</p>
+    <div class="data-table-wrapper" style="margin-top: 2rem;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Emergency Info</th>
+                    <th>Total Treks</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in trekkers %}
+                <tr>
+                    <td>{{ t.name }}</td>
+                    <td>{{ t.username }}</td>
+                    <td>{{ t.email }}</td>
+                    <td>{{ t.phone }}</td>
+                    <td>
+                        Phone: {{ t.emergency_phone if t.emergency_phone else "N/A" }}<br>
+                        Relation: {{ t.emergency_relation if t.emergency_relation else "N/A" }}
+                    </td>
+                    <td style="text-align: center;"><strong>{{ t.bookings|length }}</strong></td>
+                    <td>
+                        {% if t.is_blacklisted %}
+                            <span class="badge badge-blacklisted">Blacklisted</span>
+                        {% else %}
+                            <span class="badge badge-active">Active</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if t.is_blacklisted %}
+                            <a href="{{ url_for('admin_trekkers_action', id=t.id, action='unblacklist') }}" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">Un-blacklist</a>
+                        {% else %}
+                            <a href="{{ url_for('admin_trekkers_action', id=t.id, action='blacklist') }}" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="return confirm('Blacklist this trekker?');">Blacklist</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="8" style="text-align: center; color: var(--secondary-color);">No trekkers found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% endblock %}

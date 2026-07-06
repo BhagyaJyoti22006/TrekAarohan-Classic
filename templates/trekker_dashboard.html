@@ -8,6 +8,14 @@
 {% block dashboard_content %}
     <h2 style="color: var(--primary-color);">Welcome to your Dashboard</h2>
     <p>You are logged in as a <strong>Trekker</strong>.</p>
+    
+    {% if current_user.is_blacklisted %}
+    <div style="background-color: #fef2f2; color: #991b1b; padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem; margin-bottom: 2rem; border: 1px solid #fecaca; text-align: center;">
+        <h3 style="margin-top: 0; color: #7f1d1d;">⚠️ Account Suspended</h3>
+        <p style="margin-bottom: 0;">Your account has been blacklisted. You can view your past and current bookings, but you cannot book new treks. If you believe this is an error, please contact an administrator.</p>
+    </div>
+    {% endif %}
+
     <div class="card" style="margin-top: 2rem;">
         <h4>Trekker Dashboard Placeholder</h4>
         <p>This is where past and upcoming bookings will appear.</p>
