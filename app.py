@@ -1,7 +1,9 @@
 import os
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from models import db, User, Trek, Booking
 
 
@@ -66,7 +68,47 @@ def create_app():
     @app.route("/admin/treks/add", methods=["GET", "POST"])
     @login_required
     def admin_treks_add():
-        return "Add Trek to TAC!"
+        if current_user.role != 2:
+            return redirect(url_for("home"))
+        if request.method == "POST":
+            name = request.form.get("name")
+            location = request.form.get("location")
+            description = request.form.get("description")
+            difficulty = request.form.get("difficulty")
+            slots_available = int(request.form.get("slots_available", 0))
+            price = float(request.form.get("price", 0.0))
+            assigned_staff_id = int(request.form.get("assigned_staff_id"))
+            try:
+                start_date = datetime.strptime(request.form.get("start_date"), "%Y-%m-%d").date()
+                end_date = datetime.strptime(request.form.get("end_date"), "%Y-%m-%d").date()
+            except (ValueError, TypeError):
+                flash("Invalid date format.", "error")
+                return redirect(request.url)
+            new_trek = Trek(
+                name=name,
+                location=location,
+                description=description,
+                difficulty=difficulty,
+                slots_available=slots_available,
+                price=price,
+                start_date=start_date,
+                end_date=end_date,
+                assigned_staff_id=assigned_staff_id,
+                cover_image=None,
+                status="open"
+            )
+            db.session.add(new_trek)
+            db.session.flush()  # Flush to generate the trek ID before committing
+            file = request.files.get("cover_image")
+            if file and file.filename != "":
+                filename = f"{new_trek.id}-{secure_filename(file.filename)}"
+                file.save(os.path.join(app.config["IMAGE_FOLDER"], filename))
+                new_trek.cover_image = filename
+            db.session.commit()
+            flash("Trek created successfully!", "success")
+            return redirect(url_for("admin_treks"))
+        staff = User.query.filter_by(role=1, is_approved=True, is_blacklisted=False).all()
+        return render_template("admin_treks_add.html", staff=staff)
     
     @app.route("/admin/staffs")
     @login_required
@@ -176,7 +218,7 @@ def create_app():
     def register():
         if current_user.is_authenticated:
             return redirect(url_for("home"))
-        if request.method=="POST":
+        if request.method == "POST":
             username = request.form.get("username")
             password = request.form.get("password")
             name = request.form.get("name")
@@ -202,7 +244,7 @@ def create_app():
                     email=email,
                     phone=phone,
                     role=role,
-                    is_approved=(False if role==1 else True),  # Staff need admin approval
+                    is_approved=(False if role == 1 else True),  # Staff need admin approval
                 )
                 db.session.add(new_user)
                 db.session.commit()

@@ -28,7 +28,7 @@
                     <td>{{ trek.location }}</td>
                     <td>
                         {{ trek.start_date.strftime('%b %d, %Y') }} - {{ trek.end_date.strftime('%b %d, %Y') }}<br>
-                        <small style="color: var(--secondary-color);">({{ (trek.end_date - trek.start_date).days }} Days)</small>
+                        <small style="color: var(--secondary-color);">({{ (trek.end_date - trek.start_date).days + 1 }} Days)</small>
                     </td>
                     <td>
                         <span style="text-transform: capitalize;">{{ trek.difficulty }}</span>
