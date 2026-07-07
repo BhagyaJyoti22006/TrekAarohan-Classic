@@ -77,6 +77,11 @@ def create_app():
     def public_about():
         return render_template("public_about.html")
     
+    @app.route("/footer")
+    def public_footer():
+        return render_template("public_footer.html")
+    
+    
     # Admin Dashboard
     @app.route("/admin/dashboard")
     @login_required

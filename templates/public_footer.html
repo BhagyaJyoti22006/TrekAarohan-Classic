@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block public_content %}
+    <div style="max-width: 800px; margin: 0 auto; padding: 3rem 1rem 4rem 1rem;">
+        <div class="card" style="padding: 3rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+            <h1 style="margin-top: 0; margin-bottom: 2rem; color: var(--primary-color);">Information</h1>
+            
+            <!-- Contact Section -->
+            <section style="margin-bottom: 4rem;">
+                <h2 id="contact" style="border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; margin-bottom: 1.5rem; color: var(--text-color);">Contact Us</h2>
+                <p style="color: var(--secondary-color); line-height: 1.6;">
+                    Need help with your upcoming adventure? Reach out to our support team!
+                </p>
+                <ul style="list-style: none; padding: 0; color: var(--secondary-color); line-height: 1.8;">
+                    <li><strong>Email:</strong> support@tac.com</li>
+                    <li><strong>Phone:</strong> +91 98765 43210</li>
+                    <li><strong>Address:</strong> 123 Adventure Town, Trek Pradesh, India</li>
+                </ul>
+            </section>
+
+            <!-- Terms Section -->
+            <section>
+                <h2 id="terms" style="border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; margin-bottom: 1.5rem; color: var(--text-color);">Terms & Conditions</h2>
+                <p style="color: var(--secondary-color); line-height: 1.6; margin-bottom: 1rem;">
+                    By booking a trek with TrekAarohan-Classic, you agree to the following terms:
+                </p>
+                <ol style="color: var(--secondary-color); line-height: 1.8; padding-left: 1.5rem;">
+                    <li>All bookings are subject to availability and guide approval.</li>
+                    <li>Cancellations must be made while the trek is still "Open".</li>
+                    <li>Participants must adhere to guide instructions at all times.</li>
+                    <li>Emergency contact information is recommended for all participants.</li>
+                    <li>We reserve the right to cancel or modify treks due to weather or safety concerns.</li>
+                </ol>
+            </section>
+        </div>
+    </div>
+{% endblock %}
