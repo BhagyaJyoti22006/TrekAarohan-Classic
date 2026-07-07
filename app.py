@@ -51,8 +51,21 @@ def create_app():
     
     @app.route("/treks")
     def public_treks():
-        treks = Trek.query.filter_by(status="open").order_by(Trek.start_date.asc()).all()
-        return render_template("public_treks.html", treks=treks)
+        q = request.args.get("q", "").strip()
+        difficulty = request.args.get("difficulty", "")
+        max_price = request.args.get("max_price", "").strip()
+        query = Trek.query.filter_by(status="open")
+        if q:
+            query = query.filter(db.or_(Trek.name.ilike(f"%{q}%"), Trek.location.ilike(f"%{q}%")))
+        if difficulty:
+            query = query.filter(Trek.difficulty == difficulty)
+        if max_price:
+            try:
+                query = query.filter(Trek.price <= float(max_price))
+            except ValueError:
+                pass
+        treks = query.order_by(Trek.start_date.asc()).all()
+        return render_template("public_treks.html", treks=treks, current_q=q, current_difficulty=difficulty, current_max_price=max_price)
     
     @app.route("/trek/<int:id>")
     def public_trek_detail(id):
