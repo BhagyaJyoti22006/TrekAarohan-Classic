@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block public_content %}
+    <div style="text-align: center; margin-top: 3rem; margin-bottom: 4rem; padding: 0 1rem;">
+        <h1 style="font-size: 3rem; margin-bottom: 0.5rem; color: var(--text-color);">About TrekAarohan-Classic</h1>
+        <p style="font-size: 1.25rem; color: var(--secondary-color);">Guiding you to the peaks of your potential.</p>
+    </div>
+
+    <!-- Main Content -->
+    <div style="max-width: 1000px; margin: 0 auto; padding: 0 1rem 4rem 1rem;">
+        
+        <!-- Our Mission -->
+        <div style="margin-bottom: 4rem;">
+            <h2 style="color: var(--primary-color); font-size: 2.2rem; margin-top: 0; margin-bottom: 1.5rem;">Our Mission</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: var(--secondary-color); margin-bottom: 0;">
+                At TrekAarohan-Classic, our mission is to provide safe, unforgettable, and expertly guided trekking experiences while promoting sustainable tourism. We believe nature has a unique power to transform us. Our goal is to make these pristine environments accessible to everyone, from first-time hikers to seasoned adventurers, while ensuring we leave no trace behind.
+            </p>
+        </div>
+
+        <!-- Who We Are (Image Alongside) -->
+        <div style="display: flex; flex-wrap: wrap; gap: 4rem; align-items: center; margin-bottom: 5rem;">
+            <div style="flex: 1; min-width: 300px;">
+                <img src="{{ url_for('static', filename='images/step.jpg') }}" alt="Taking the first step on a new adventure" style="width: 100%; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);">
+            </div>
+            <div style="flex: 1; min-width: 300px;">
+                <h3 style="color: var(--text-color); font-size: 1.8rem; margin-bottom: 0.25rem; margin-top: 0;">Who We Are</h3>
+                <p style="font-size: 1.1rem; line-height: 1.8; color: var(--secondary-color); margin-bottom: 0;">
+                    TrekAarohan-Classic was born out of deep love for the great outdoors and a desire to share breathtaking trails with the world. Over the years, we have grown from a small group to a premier trekking organization trusted by adventurers throughout the country.<br>
+                    Our staff consists of highly trained professionals who prioritize your safety above all else. Every guide has years of trekking experience. So when you trek with us, you are trekking with family.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Our Core Values -->
+        <div style="background-color: #f0fdf4; border-left: 4px solid var(--primary-color); padding: 2.5rem; border-radius: 8px;">
+            <h3 style="color: var(--text-color); font-size: 1.6rem; margin-top: 0; margin-bottom: 1.5rem;">Our Core Values</h3>
+            <ul style="font-size: 1.1rem; line-height: 1.8; color: var(--secondary-color); padding-left: 1.5rem; margin-bottom: 0;">
+                <li style="margin-bottom: 0.5rem;"><strong>Expert Guides:</strong> Certified and experienced professionals leading every trek.</li>
+                <li style="margin-bottom: 0.5rem;"><strong>Safety First:</strong> Rigorous safety protocols and emergency response plans.</li>
+                <li style="margin-bottom: 0.5rem;"><strong>Eco-Friendly:</strong> Commitment to zero-waste and sustainable camping practices.</li>
+                <li><strong>Community Driven:</strong> We support local economies by employing regional staff and sourcing local supplies.</li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

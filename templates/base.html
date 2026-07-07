@@ -16,7 +16,7 @@
         <div class="nav-links" style="display: flex; align-items: center;">
             <a href="/">Home</a>
             <a href="{{ url_for('public_treks') }}">Browse Treks</a>
-            <a href="#">About Us</a>
+            <a href="{{ url_for('public_about') }}">About Us</a>
             {% if current_user.is_authenticated %}
                 {% if current_user.role == 2 %}
                     <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline" style="margin-left: 2rem; padding: 0.4rem 1rem;">Dashboard</a>

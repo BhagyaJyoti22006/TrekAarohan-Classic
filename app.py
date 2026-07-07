@@ -73,6 +73,9 @@ def create_app():
         staff_completed_treks = Trek.query.filter_by(assigned_staff_id=trek.assigned_staff_id, status="completed").count()
         return render_template("public_trek_detail.html", trek=trek, staff_completed_treks=staff_completed_treks)
     
+    @app.route("/about")
+    def public_about():
+        return render_template("public_about.html")
     
     # Admin Dashboard
     @app.route("/admin/dashboard")
