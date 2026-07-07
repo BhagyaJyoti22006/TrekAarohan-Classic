@@ -46,7 +46,8 @@ def create_app():
     # Home Route
     @app.route("/")
     def home():
-        return render_template("public_home.html")
+        featured_treks = Trek.query.filter_by(status="open").order_by(Trek.id.desc()).limit(3).all()
+        return render_template("public_home.html", featured_treks=featured_treks)
     
     @app.route("/trek/<int:id>")
     def public_trek_detail(id):

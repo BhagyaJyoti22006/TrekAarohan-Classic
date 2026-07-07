@@ -47,7 +47,11 @@
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 3rem;">
                 <div>
                     <h3 style="margin-top: 0; font-size: 1.5rem;">About This Trek</h3>
-                    <div style="line-height: 1.8; color: var(--text-color); font-size: 1.05rem; white-space: pre-wrap;">{{ trek.description or 'No description provided.' }}</div>
+                    {% if trek.description %}
+                        <div style="line-height: 1.8; color: var(--text-color); font-size: 1.05rem; white-space: pre-wrap;">{{ trek.description }}</div>
+                    {% else %}
+                        <div style="line-height: 1.8; color: #9ca3af; font-style: italic; font-size: 1.05rem;">No description provided.</div>
+                    {% endif %}
                 </div>
                 
                 <div>
