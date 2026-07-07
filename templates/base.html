@@ -15,7 +15,7 @@
         </a>
         <div class="nav-links" style="display: flex; align-items: center;">
             <a href="/">Home</a>
-            <a href="#">Browse Treks</a>
+            <a href="{{ url_for('public_treks') }}">Browse Treks</a>
             <a href="#">About Us</a>
             {% if current_user.is_authenticated %}
                 {% if current_user.role == 2 %}

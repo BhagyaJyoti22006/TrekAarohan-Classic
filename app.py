@@ -49,6 +49,11 @@ def create_app():
         featured_treks = Trek.query.filter_by(status="open").order_by(Trek.id.desc()).limit(3).all()
         return render_template("public_home.html", featured_treks=featured_treks)
     
+    @app.route("/treks")
+    def public_treks():
+        treks = Trek.query.filter_by(status="open").order_by(Trek.start_date.asc()).all()
+        return render_template("public_treks.html", treks=treks)
+    
     @app.route("/trek/<int:id>")
     def public_trek_detail(id):
         trek = Trek.query.get_or_404(id)
