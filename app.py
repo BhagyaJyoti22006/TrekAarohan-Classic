@@ -71,10 +71,12 @@ def create_app():
     def public_trek_detail(id):
         trek = Trek.query.get_or_404(id)
         staff_completed_treks = Trek.query.filter_by(assigned_staff_id=trek.assigned_staff_id, status="completed").count()
-        has_booked = False
+        booking_status = None
         if current_user.is_authenticated and current_user.role == 0:
-            has_booked = Booking.query.filter_by(user_id=current_user.id, trek_id=id, status="booked").first() is not None
-        return render_template("public_trek_detail.html", trek=trek, staff_completed_treks=staff_completed_treks, has_booked=has_booked)
+            booking = Booking.query.filter(Booking.user_id == current_user.id, Booking.trek_id == id, Booking.status != "cancelled").first()
+            if booking:
+                booking_status = booking.status
+        return render_template("public_trek_detail.html", trek=trek, staff_completed_treks=staff_completed_treks, booking_status=booking_status)
     
     @app.route("/about")
     def public_about():
@@ -119,12 +121,18 @@ def create_app():
             location = request.form.get("location")
             description = request.form.get("description")
             difficulty = request.form.get("difficulty")
+            if difficulty not in ["easy", "medium", "hard"]:
+                flash("Invalid difficulty level.", "error")
+                return redirect(request.url)
             slots_available = int(request.form.get("slots_available", 0))
             price = float(request.form.get("price", 0.0))
             assigned_staff_id = int(request.form.get("assigned_staff_id"))
             try:
                 start_date = datetime.strptime(request.form.get("start_date"), "%Y-%m-%d").date()
                 end_date = datetime.strptime(request.form.get("end_date"), "%Y-%m-%d").date()
+                if end_date < start_date:
+                    flash("End date cannot be before start date.", "error")
+                    return redirect(request.url)
             except (ValueError, TypeError):
                 flash("Invalid date format.", "error")
                 return redirect(request.url)
@@ -164,21 +172,33 @@ def create_app():
             trek.name = request.form.get("name")
             trek.location = request.form.get("location")
             trek.description = request.form.get("description")
-            trek.difficulty = request.form.get("difficulty")
+            difficulty = request.form.get("difficulty")
+            if difficulty not in ["easy", "medium", "hard"]:
+                flash("Invalid difficulty level.", "error")
+                return redirect(request.url)
+            trek.difficulty = difficulty
             slots_available = int(request.form.get("slots_available", 0))
             trek.price = float(request.form.get("price", 0.0))
             trek.assigned_staff_id = int(request.form.get("assigned_staff_id"))
             # Status & Slots logic
             new_status = request.form.get("status")
-            if new_status == "full" or (new_status == "open" and slots_available == 0):
-                trek.status = "full"
-                trek.slots_available = 0
+            valid_statuses = ["open", "full", "ongoing", "completed", "cancelled"]
+            if new_status in valid_statuses:
+                if new_status == "full" or (new_status == "open" and slots_available <= 0):
+                    trek.status = "full"
+                    trek.slots_available = 0
+                else:
+                    trek.status = new_status
+                    trek.slots_available = slots_available
             else:
-                trek.status = new_status
-                trek.slots_available = slots_available
+                flash("Invalid status.", "error")
+                return redirect(request.url)
             try:
                 trek.start_date = datetime.strptime(request.form.get("start_date"), "%Y-%m-%d").date()
                 trek.end_date = datetime.strptime(request.form.get("end_date"), "%Y-%m-%d").date()
+                if trek.end_date < trek.start_date:
+                    flash("End date cannot be before start date.", "error")
+                    return redirect(request.url)
             except (ValueError, TypeError):
                 flash("Invalid date format.", "error")
                 return redirect(request.url)

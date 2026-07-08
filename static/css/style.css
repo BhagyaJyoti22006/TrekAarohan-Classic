@@ -95,6 +95,7 @@ h1, h2 {
 .badge-full { background-color: #F59E0B; color: white; }
 .badge-completed { background-color: var(--secondary-color); color: white; }
 .badge-ongoing { background-color: #DBEAFE; color: #1E40AF; }
+.badge-special { background-color: #10B981; color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
 
 /* Data Tables */
 .data-table-wrapper {

@@ -80,8 +80,12 @@
                     <a href="{{ url_for('login') }}" class="btn btn-primary" style="padding: 1rem 4rem; font-size: 1.2rem;">Log in to Book</a>
                 {% elif current_user.role != 0 %}
                     <div class="badge badge-inactive" style="padding: 1rem 4rem; font-size: 1.2rem; background-color: var(--secondary-color); color: white;">Only Trekkers can book</div>
-                {% elif has_booked %}
-                    <div class="badge badge-inactive" style="padding: 1rem 4rem; font-size: 1.2rem; background-color: var(--secondary-color); color: white;">BOOKED</div>
+                {% elif booking_status %}
+                    {% if booking_status == 'completed' %}
+                        <div class="badge badge-special" style="padding: 1rem 4rem; font-size: 1.2rem; font-weight: bold;">🏆 Trek Completed</div>
+                    {% else %}
+                        <div class="badge badge-inactive" style="padding: 1rem 4rem; font-size: 1.2rem; background-color: var(--secondary-color); color: white;">BOOKED</div>
+                    {% endif %}
                 {% elif trek.status == 'full' %}
                     <div class="badge badge-inactive" style="padding: 1rem 4rem; font-size: 1.2rem; background-color: #ef4444; color: white;">Sold Out</div>
                 {% elif trek.status != 'open' %}

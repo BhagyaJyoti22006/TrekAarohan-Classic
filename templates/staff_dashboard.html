@@ -2,7 +2,7 @@
 {% set active_page = "dashboard" %}
 
 {% block dashboard_content %}
-    <h2 style="color: var(--primary-color);">Staff Dashboard</h2>
+    <h2 style="color: var(--primary-color);">Welcome back, {{ current_user.name }}</h2>
     
     {% if current_user.is_blacklisted %}
     <div style="background-color: #fef2f2; color: #991b1b; padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem; margin-bottom: 2rem; border: 1px solid #fecaca; text-align: center;">
