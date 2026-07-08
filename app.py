@@ -294,6 +294,29 @@ def create_app():
     def staff_profile():
         if current_user.role != 1 or not current_user.is_approved:
             return redirect(url_for("home"))
+        if request.method == "POST":
+            name = request.form.get("name")
+            email = request.form.get("email")
+            phone = request.form.get("phone")
+            emergency_phone = request.form.get("emergency_phone")
+            emergency_relation = request.form.get("emergency_relation")
+            experience = request.form.get("experience")
+            if not name or not phone or not email:
+                flash("Name, Email, and Phone number are required.", "error")
+            else:
+                existing_user = User.query.filter(User.email == email, User.id != current_user.id).first()
+                if existing_user:
+                    flash("Email is already registered by another user.", "error")
+                else:
+                    current_user.name = name
+                    current_user.email = email
+                    current_user.phone = phone
+                    current_user.emergency_phone = emergency_phone
+                    current_user.emergency_relation = emergency_relation
+                    current_user.experience = experience
+                    db.session.commit()
+                    flash("Profile updated successfully.", "success")
+                    return redirect(url_for("staff_profile"))
         return render_template("staff_profile.html")
     
     @app.route("/staff/trek/<int:trek_id>", methods=["GET", "POST"])

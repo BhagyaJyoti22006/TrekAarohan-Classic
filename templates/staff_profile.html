@@ -4,7 +4,52 @@
 {% block dashboard_content %}
     <h2>Profile Settings</h2>
     <div class="card" style="margin-top: 2rem;">
-        <h4>Staff Profile Placeholder</h4>
-        <p>This is where staff members will update their profile and experience details.</p>
+        <h3 style="margin-top: 0;">Personal Information</h3>
+        <form method="POST" action="{{ url_for('staff_profile') }}" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+            
+            <div class="form-group">
+                <label>Username (Non-editable)</label>
+                <input type="text" class="form-control" value="{{ current_user.username }}" readonly style="background-color: #f1f5f9; color: #64748b;">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address <span style="color: #ef4444;">*</span></label>
+                <input type="email" id="email" name="email" class="form-control" value="{{ current_user.email }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="name">Full Name <span style="color: #ef4444;">*</span></label>
+                <input type="text" id="name" name="name" class="form-control" value="{{ current_user.name }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number <span style="color: #ef4444;">*</span></label>
+                <input type="text" id="phone" name="phone" class="form-control" value="{{ current_user.phone }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="experience">Experience / Bio</label>
+                <textarea id="experience" name="experience" class="form-control" rows="4" placeholder="Briefly describe your guiding experience and qualifications" style="resize: vertical;">{{ current_user.experience or '' }}</textarea>
+                <small style="color: var(--secondary-color); display: block; margin-top: 0.25rem;">This will be displayed to trekkers on the trek details page.</small>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">
+            <h3 style="margin: 0; color: #ef4444;">Emergency Contact</h3>
+
+            <div class="form-group">
+                <label for="emergency_phone">Phone Number</label>
+                <input type="text" id="emergency_phone" name="emergency_phone" class="form-control" value="{{ current_user.emergency_phone or '' }}">
+                <small style="color: var(--secondary-color); display: block; margin-top: 0.25rem;">We will only call this number in case of an emergency.</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="emergency_relation">Relationship to You</label>
+                <input type="text" id="emergency_relation" name="emergency_relation" class="form-control" value="{{ current_user.emergency_relation or '' }}" placeholder="e.g., Spouse, Parent, Sibling">
+            </div>
+
+            <div style="margin-top: 0.5rem;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem; font-size: 1.1rem;">Save Changes</button>
+            </div>
+        </form>
     </div>
 {% endblock %}
