@@ -280,7 +280,8 @@ def create_app():
     def trekker_bookings():
         if current_user.role != 0:
             return redirect(url_for("home"))
-        return render_template("trekker_bookings.html")
+        active_bookings = Booking.query.filter_by(user_id=current_user.id, status="booked").all()
+        return render_template("trekker_bookings.html", bookings=active_bookings)
     
     @app.route("/trekker/history")
     @login_required
@@ -323,6 +324,31 @@ def create_app():
         db.session.add(new_booking)
         db.session.commit()
         flash(f"Successfully booked {trek.name}!", "success")
+        return redirect(url_for("trekker_bookings"))
+    
+    @app.route("/cancel_booking/<int:booking_id>", methods=["POST"])
+    @login_required
+    def cancel_booking(booking_id):
+        if current_user.role != 0:
+            return redirect(url_for("home"))
+        booking = Booking.query.get_or_404(booking_id)
+        if booking.user_id != current_user.id:
+            flash("You do not have permission to cancel this booking.", "error")
+            return redirect(url_for("trekker_bookings"))
+        if booking.status != "booked":
+            flash("This booking cannot be cancelled.", "error")
+            return redirect(url_for("trekker_bookings"))
+        if booking.trek.status in ["completed", "cancelled"]:
+            flash("You cannot cancel a booking for a trek that has already concluded.", "error")
+            return redirect(url_for("trekker_bookings"))
+        booking.status = "cancelled"
+        booking.cancelled_date = datetime.utcnow()
+        trek = booking.trek
+        trek.slots_available += 1
+        if trek.status == "full":
+            trek.status = "open"
+        db.session.commit()
+        flash(f"Your booking for '{trek.name}' has been successfully cancelled.", "success")
         return redirect(url_for("trekker_bookings"))
     
     
