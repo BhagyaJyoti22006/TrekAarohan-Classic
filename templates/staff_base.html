@@ -1,0 +1,8 @@
+{% extends "base_dashboard.html" %}
+
+{% block sidebar_top %}
+    <a href="{{ url_for('staff_dashboard') }}" class="{% if active_page == 'dashboard' %}active{% endif %}">My Dashboard</a>
+    <a href="{{ url_for('staff_treks') }}" class="{% if active_page == 'treks' %}active{% endif %}">My Treks</a>
+    <a href="{{ url_for('staff_participants') }}" class="{% if active_page == 'participants' %}active{% endif %}">All Participants</a>
+    <a href="{{ url_for('staff_profile') }}" class="{% if active_page == 'profile' %}active{% endif %}">Profile Settings</a>
+{% endblock %}

@@ -264,7 +264,30 @@ def create_app():
     @app.route("/staff/dashboard")
     @login_required
     def staff_dashboard():
+        if current_user.role != 1 or not current_user.is_approved:
+            return redirect(url_for("home"))
         return render_template("staff_dashboard.html")
+    
+    @app.route("/staff/treks")
+    @login_required
+    def staff_treks():
+        if current_user.role != 1 or not current_user.is_approved:
+            return redirect(url_for("home"))
+        return render_template("staff_treks.html")
+    
+    @app.route("/staff/participants")
+    @login_required
+    def staff_participants():
+        if current_user.role != 1 or not current_user.is_approved:
+            return redirect(url_for("home"))
+        return render_template("staff_participants.html")
+    
+    @app.route("/staff/profile", methods=["GET", "POST"])
+    @login_required
+    def staff_profile():
+        if current_user.role != 1 or not current_user.is_approved:
+            return redirect(url_for("home"))
+        return render_template("staff_profile.html")
     
     
     # Trekker Dashboard

@@ -1,9 +1,5 @@
-{% extends "base_dashboard.html" %}
-
-{% block sidebar_top %}
-    <a href="#" class="active">Staff Overview</a>
-    <a href="#">My Assignments</a>
-{% endblock %}
+{% extends "staff_base.html" %}
+{% set active_page = "dashboard" %}
 
 {% block dashboard_content %}
     <h2 style="color: var(--primary-color);">Welcome to your Dashboard</h2>
