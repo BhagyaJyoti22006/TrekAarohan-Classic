@@ -280,7 +280,13 @@ def create_app():
     def staff_participants():
         if current_user.role != 1 or not current_user.is_approved:
             return redirect(url_for("home"))
-        return render_template("staff_participants.html")
+        assigned_treks = Trek.query.filter_by(assigned_staff_id=current_user.id).all()
+        trek_ids = [t.id for t in assigned_treks]
+        if trek_ids:
+            bookings = Booking.query.filter(Booking.trek_id.in_(trek_ids), Booking.status == "booked").all()
+        else:
+            bookings = []
+        return render_template("staff_participants.html", bookings=bookings)
     
     @app.route("/staff/profile", methods=["GET", "POST"])
     @login_required
@@ -288,6 +294,24 @@ def create_app():
         if current_user.role != 1 or not current_user.is_approved:
             return redirect(url_for("home"))
         return render_template("staff_profile.html")
+    
+    @app.route("/staff/cancel_booking/<int:booking_id>", methods=["POST"])
+    @login_required
+    def staff_cancel_participant(booking_id):
+        if current_user.role != 1 or not current_user.is_approved:
+            return redirect(url_for("home"))
+        booking = Booking.query.filter_by(id=booking_id, status="booked").first_or_404()
+        trek = booking.trek
+        if trek.assigned_staff_id != current_user.id:
+            flash("You do not have permission to manage this booking.", "error")
+            return redirect(url_for("staff_participants"))
+        booking.status = "cancelled"
+        trek.slots_available += 1
+        if trek.status == "full":
+            trek.status = "open"
+        db.session.commit()
+        flash("Booking cancelled successfully. Slot reopened.", "success")
+        return redirect(url_for("staff_participants"))
     
     
     # Trekker Dashboard
