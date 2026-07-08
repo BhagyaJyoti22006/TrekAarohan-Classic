@@ -5,6 +5,16 @@
 <div class="container" style="max-width: 900px; margin: 0 auto; padding: 2rem 1rem 4rem 1rem;">
     <a href="{{ url_for('home') }}" style="color: var(--secondary-color); text-decoration: none; display: inline-block; margin-bottom: 1rem;">&larr; Back to Treks</a>
     
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div style="padding: 0.75rem; margin-bottom: 1rem; border-radius: 6px; background-color: {% if category == 'error' %}#fee2e2{% else %}#dcfce7{% endif %}; color: {% if category == 'error' %}#991b1b{% else %}#166534{% endif %};">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
     <div class="card" style="padding: 0; overflow: hidden;">
         {% if trek.cover_image %}
             <div style="height: 450px; background-image: url('{{ url_for('static', filename='uploads/' ~ trek.cover_image) }}'); background-size: cover; background-position: center;"></div>
@@ -70,12 +80,14 @@
                     <a href="{{ url_for('login') }}" class="btn btn-primary" style="padding: 1rem 4rem; font-size: 1.2rem;">Log in to Book</a>
                 {% elif current_user.role != 0 %}
                     <div class="badge badge-inactive" style="padding: 1rem 4rem; font-size: 1.2rem; background-color: var(--secondary-color); color: white;">Only Trekkers can book</div>
+                {% elif has_booked %}
+                    <div class="badge badge-inactive" style="padding: 1rem 4rem; font-size: 1.2rem; background-color: var(--secondary-color); color: white;">BOOKED</div>
                 {% elif trek.status == 'full' %}
                     <div class="badge badge-inactive" style="padding: 1rem 4rem; font-size: 1.2rem; background-color: #ef4444; color: white;">Sold Out</div>
                 {% elif trek.status != 'open' %}
                     <div class="badge badge-inactive" style="padding: 1rem 4rem; font-size: 1.2rem; background-color: var(--primary-color); color: white;">Booking Closed ({{ trek.status|capitalize }})</div>
                 {% else %}
-                    <form method="POST" action="#" style="display: inline-block;">
+                    <form method="POST" action="{{ url_for('book_trek', trek_id=trek.id) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-accent" style="padding: 1rem 4rem; font-size: 1.2rem; border-radius: 8px;">Book This Trek</button>
                     </form>
                 {% endif %}

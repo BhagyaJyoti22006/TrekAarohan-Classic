@@ -71,7 +71,10 @@ def create_app():
     def public_trek_detail(id):
         trek = Trek.query.get_or_404(id)
         staff_completed_treks = Trek.query.filter_by(assigned_staff_id=trek.assigned_staff_id, status="completed").count()
-        return render_template("public_trek_detail.html", trek=trek, staff_completed_treks=staff_completed_treks)
+        has_booked = False
+        if current_user.is_authenticated and current_user.role == 0:
+            has_booked = Booking.query.filter_by(user_id=current_user.id, trek_id=id, status="booked").first() is not None
+        return render_template("public_trek_detail.html", trek=trek, staff_completed_treks=staff_completed_treks, has_booked=has_booked)
     
     @app.route("/about")
     def public_about():
@@ -292,6 +295,35 @@ def create_app():
         if current_user.role != 0:
             return redirect(url_for("home"))
         return render_template("trekker_profile.html")
+    
+    @app.route("/book/<int:trek_id>", methods=["POST"])
+    @login_required
+    def book_trek(trek_id):
+        if current_user.role != 0:
+            flash("Only trekkers can book treks.", "error")
+            return redirect(url_for("public_trek_detail", id=trek_id))
+        if current_user.is_blacklisted:
+            flash("Your account is suspended. You cannot book new treks.", "error")
+            return redirect(url_for("public_trek_detail", id=trek_id))
+        trek = Trek.query.get_or_404(trek_id)
+        if trek.status != "open":
+            flash("This trek is no longer open for booking.", "error")
+            return redirect(url_for("public_trek_detail", id=trek_id))
+        if trek.slots_available <= 0:
+            flash("This trek is sold out.", "error")
+            return redirect(url_for("public_trek_detail", id=trek_id))
+        existing_booking = Booking.query.filter_by(user_id=current_user.id, trek_id=trek.id, status="booked").first()
+        if existing_booking:
+            flash("You have already booked this trek.", "error")
+            return redirect(url_for("public_trek_detail", id=trek_id))
+        new_booking = Booking(user_id=current_user.id, trek_id=trek.id)
+        trek.slots_available -= 1
+        if trek.slots_available == 0:
+            trek.status = "full"
+        db.session.add(new_booking)
+        db.session.commit()
+        flash(f"Successfully booked {trek.name}!", "success")
+        return redirect(url_for("trekker_bookings"))
     
     
     @app.route("/logout")
