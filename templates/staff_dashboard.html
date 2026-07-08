@@ -2,18 +2,74 @@
 {% set active_page = "dashboard" %}
 
 {% block dashboard_content %}
-    <h2 style="color: var(--primary-color);">Welcome to your Dashboard</h2>
-    <p>You are logged in as a <strong>Staff Member</strong>.</p>
+    <h2 style="color: var(--primary-color);">Staff Dashboard</h2>
     
     {% if current_user.is_blacklisted %}
     <div style="background-color: #fef2f2; color: #991b1b; padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem; margin-bottom: 2rem; border: 1px solid #fecaca; text-align: center;">
         <h3 style="margin-top: 0; color: #7f1d1d;">⚠️ Account Suspended</h3>
-        <p style="margin-bottom: 0;">Your account has been blacklisted. You can still view and manage your previously assigned treks, but you will not be assigned any new treks. If you believe this is an error, please contact an administrator.</p>
+        <p style="margin-bottom: 0;">Your staff account has been suspended. You cannot be assigned to new treks. If you believe this is an error, please contact an administrator.</p>
     </div>
     {% endif %}
 
-    <div class="card" style="margin-top: 2rem;">
-        <h4>Staff Operations Placeholder</h4>
-        <p>This is where assigned treks and customer management will go.</p>
+    {% if not current_user.emergency_phone or not current_user.emergency_relation %}
+    <div style="background-color: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 6px; margin-top: 1.5rem; margin-bottom: 2rem; border-left: 4px solid #ef4444; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <strong>Action Required:</strong> Please complete your emergency contact information.
+        </div>
+        <a href="{{ url_for('staff_profile') }}" class="btn btn-primary" style="padding: 0.4rem 1rem; background-color: #991b1b; color: white; border: none;">Update Profile</a>
+    </div>
+    {% endif %}
+    
+    <!-- Quick Stats -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 2rem; margin-bottom: 3rem;">
+        <div class="card" style="text-align: center;">
+            <h3 style="color: var(--secondary-color); font-size: 1rem; margin-top: 0;">Total Assigned Treks</h3>
+            <p style="font-size: 2.5rem; font-weight: bold; margin: 0; color: var(--accent-color);">{{ total_treks }}</p>
+        </div>
+        <div class="card" style="text-align: center;">
+            <h3 style="color: var(--secondary-color); font-size: 1rem; margin-top: 0;">Active Participants</h3>
+            <p style="font-size: 2.5rem; font-weight: bold; margin: 0; color: var(--primary-color);">{{ active_participants }}</p>
+        </div>
+        <div class="card" style="text-align: center;">
+            <h3 style="color: var(--secondary-color); font-size: 1rem; margin-top: 0;">Unique Trekkers</h3>
+            <p style="font-size: 2.5rem; font-weight: bold; margin: 0; color: var(--text-color);">{{ unique_trekkers }}</p>
+        </div>
+    </div>
+    
+    <!-- Ongoing Treks Section -->
+    <div style="margin-bottom: 3rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
+            <h2 style="margin: 0; font-size: 1.5rem;">Ongoing Treks</h2>
+            <a href="{{ url_for('staff_treks') }}" style="color: var(--primary-color); text-decoration: none; font-weight: 500;">View All Assigned Treks &rarr;</a>
+        </div>
+        
+        {% if ongoing_treks %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem;">
+            {% for t in ongoing_treks %}
+            <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); transition: transform 0.2s;">
+                {% if t.cover_image %}
+                    <div style="height: 180px; background-image: url('{{ url_for('static', filename='uploads/' ~ t.cover_image) }}'); background-size: cover; background-position: center;"></div>
+                {% else %}
+                    <div style="height: 180px; background-image: url('{{ url_for('static', filename='images/trek.jpg') }}'); background-size: cover; background-position: center;"></div>
+                {% endif %}
+                
+                <div style="padding: 1.25rem; display: flex; flex-direction: column; flex-grow: 1;">
+                    <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">{{ t.name }}</h3>
+                    
+                    <p style="color: var(--secondary-color); font-size: 0.95rem; margin: 0 0 0.5rem 0;">📍 {{ t.location }}</p>
+                    <p style="color: var(--secondary-color); font-size: 0.95rem; margin: 0 0 1.5rem 0;">📅 {{ t.start_date.strftime('%b %d, %Y') }} to {{ t.end_date.strftime('%b %d, %Y') }}</p>
+                    
+                    <div style="margin-top: auto; text-align: center;">
+                        <a href="{{ url_for('staff_trek_manage', trek_id=t.id) }}" class="btn btn-primary" style="width: 100%; display: block; box-sizing: border-box;">Manage Trek</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card" style="text-align: center; padding: 3rem; color: var(--secondary-color);">
+            <p style="margin: 0;">You currently have no ongoing treks.</p>
+        </div>
+        {% endif %}
     </div>
 {% endblock %}

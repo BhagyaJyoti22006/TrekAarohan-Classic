@@ -266,7 +266,18 @@ def create_app():
     def staff_dashboard():
         if current_user.role != 1 or not current_user.is_approved:
             return redirect(url_for("home"))
-        return render_template("staff_dashboard.html")
+        assigned_treks = Trek.query.filter_by(assigned_staff_id=current_user.id).all()
+        total_treks = len(assigned_treks)
+        active_trek_ids = [t.id for t in assigned_treks if t.status not in ["completed", "cancelled"]]
+        active_participants = 0
+        if active_trek_ids:
+            active_participants = Booking.query.filter(Booking.trek_id.in_(active_trek_ids), Booking.status == "booked").count()
+        all_trek_ids = [t.id for t in assigned_treks]
+        unique_trekkers = 0
+        if all_trek_ids:
+            unique_trekkers = db.session.query(Booking.user_id).filter(Booking.trek_id.in_(all_trek_ids), Booking.status == "booked").distinct().count()
+        ongoing_treks_list = [t for t in assigned_treks if t.status == "ongoing"]
+        return render_template("staff_dashboard.html", total_treks=total_treks, active_participants=active_participants, unique_trekkers=unique_trekkers, ongoing_treks=ongoing_treks_list)
     
     @app.route("/staff/treks")
     @login_required
