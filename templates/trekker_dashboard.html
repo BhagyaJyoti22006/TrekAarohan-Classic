@@ -12,6 +12,15 @@
     </div>
     {% endif %}
 
+    {% if not current_user.emergency_phone or not current_user.emergency_relation %}
+    <div style="background-color: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 6px; margin-top: 1.5rem; margin-bottom: 2rem; border-left: 4px solid #ef4444; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <strong>Action Required:</strong> Please complete your emergency contact information before your next trek.
+        </div>
+        <a href="{{ url_for('trekker_profile') }}" class="btn btn-primary" style="padding: 0.4rem 1rem; background-color: #991b1b; color: white; border: none;">Update Profile</a>
+    </div>
+    {% endif %}
+
     <div class="card" style="margin-top: 2rem;">
         <h4>Trekker Dashboard Placeholder</h4>
         <p>This is where past and upcoming bookings will appear.</p>
