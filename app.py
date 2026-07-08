@@ -268,7 +268,30 @@ def create_app():
     @app.route("/trekker/dashboard")
     @login_required
     def trekker_dashboard():
+        if current_user.role != 0:
+            return redirect(url_for("home"))
         return render_template("trekker_dashboard.html")
+    
+    @app.route("/trekker/bookings")
+    @login_required
+    def trekker_bookings():
+        if current_user.role != 0:
+            return redirect(url_for("home"))
+        return render_template("trekker_bookings.html")
+    
+    @app.route("/trekker/history")
+    @login_required
+    def trekker_history():
+        if current_user.role != 0:
+            return redirect(url_for("home"))
+        return render_template("trekker_history.html")
+    
+    @app.route("/trekker/profile")
+    @login_required
+    def trekker_profile():
+        if current_user.role != 0:
+            return redirect(url_for("home"))
+        return render_template("trekker_profile.html")
     
     
     @app.route("/logout")

@@ -1,9 +1,5 @@
-{% extends "base_dashboard.html" %}
-
-{% block sidebar_top %}
-    <a href="#" class="active">My Bookings</a>
-    <a href="#">Profile Settings</a>
-{% endblock %}
+{% extends "trekker_base.html" %}
+{% set active_page = "dashboard" %}
 
 {% block dashboard_content %}
     <h2 style="color: var(--primary-color);">Welcome to your Dashboard</h2>
