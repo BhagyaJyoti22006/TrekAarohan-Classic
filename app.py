@@ -273,7 +273,8 @@ def create_app():
     def staff_treks():
         if current_user.role != 1 or not current_user.is_approved:
             return redirect(url_for("home"))
-        return render_template("staff_treks.html")
+        treks = Trek.query.filter_by(assigned_staff_id=current_user.id).all()
+        return render_template("staff_treks.html", treks=treks)
     
     @app.route("/staff/participants")
     @login_required
@@ -283,7 +284,7 @@ def create_app():
         assigned_treks = Trek.query.filter_by(assigned_staff_id=current_user.id).all()
         trek_ids = [t.id for t in assigned_treks]
         if trek_ids:
-            bookings = Booking.query.filter(Booking.trek_id.in_(trek_ids), Booking.status == "booked").all()
+            bookings = Booking.query.filter(Booking.trek_id.in_(trek_ids)).all()
         else:
             bookings = []
         return render_template("staff_participants.html", bookings=bookings)
@@ -294,6 +295,32 @@ def create_app():
         if current_user.role != 1 or not current_user.is_approved:
             return redirect(url_for("home"))
         return render_template("staff_profile.html")
+    
+    @app.route("/staff/trek/<int:trek_id>", methods=["GET", "POST"])
+    @login_required
+    def staff_trek_manage(trek_id):
+        if current_user.role != 1 or not current_user.is_approved:
+            return redirect(url_for("home"))
+        trek = Trek.query.get_or_404(trek_id)
+        if trek.assigned_staff_id != current_user.id:
+            flash("You do not have permission to manage this trek.", "error")
+            return redirect(url_for("staff_treks"))
+        if request.method == "POST":
+            new_status = request.form.get("status")
+            new_slots = request.form.get("slots_available")
+            valid_statuses = ["open", "full", "ongoing", "completed", "cancelled"]
+            if new_status in valid_statuses:
+                trek.status = new_status
+            if new_slots is not None:
+                try:
+                    trek.slots_available = int(new_slots)
+                except ValueError:
+                    pass
+            db.session.commit()
+            flash("Trek updated successfully.", "success")
+            return redirect(url_for("staff_trek_manage", trek_id=trek.id))
+        bookings = Booking.query.filter_by(trek_id=trek.id).all()
+        return render_template("staff_trek_manage.html", trek=trek, bookings=bookings)
     
     @app.route("/staff/cancel_booking/<int:booking_id>", methods=["POST"])
     @login_required

@@ -2,9 +2,40 @@
 {% set active_page = "treks" %}
 
 {% block dashboard_content %}
-    <h2>My Treks</h2>
-    <div class="card" style="margin-top: 2rem;">
-        <h4>Staff Treks Placeholder</h4>
-        <p>This is where staff members will view all details of their assigned treks.</p>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2 style="margin: 0; color: var(--primary-color);">My Assigned Treks</h2>
+    </div>
+    
+    <div class="data-table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Trek Name</th>
+                    <th>Dates</th>
+                    <th>Status</th>
+                    <th>Slots Available</th>
+                    <th>Participants</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trek in treks %}
+                <tr>
+                    <td><strong>{{ trek.name }}</strong></td>
+                    <td>{{ trek.start_date.strftime("%b %d, %Y") }} - {{ trek.end_date.strftime("%b %d, %Y") }}</td>
+                    <td><span class="badge badge-{{ trek.status }}">{{ trek.status|capitalize }}</span></td>
+                    <td>{{ trek.slots_available }}</td>
+                    <td>{{ trek.bookings | selectattr("status", "equalto", "booked") | list | length }}</td>
+                    <td>
+                        <a href="{{ url_for('staff_trek_manage', trek_id=trek.id) }}" class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">Manage</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: var(--secondary-color);">You have no assigned treks.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% endblock %}

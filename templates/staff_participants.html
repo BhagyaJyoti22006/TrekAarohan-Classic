@@ -2,16 +2,11 @@
 {% set active_page = "participants" %}
 
 {% block dashboard_content %}
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h2 style="margin: 0; color: var(--primary-color);">All Participants</h2>
-    </div>
+    <h2 style="margin: 0; color: var(--primary-color);">All Participants</h2>
 
-    <div class="card" style="margin-top: 2rem;">
-        <h3 style="margin-top: 0; margin-bottom: 1.5rem; color: var(--text-color); border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">Participant Roster</h3>
-        
-        {% if bookings %}
-        <div class="data-table-wrapper">
-            <table class="data-table">
+    {% if bookings %}
+    <div class="data-table-wrapper" style="margin-top: 2rem;">
+        <table class="data-table">
                 <thead>
                     <tr>
                         <th>Booking ID</th>
@@ -44,12 +39,20 @@
                             {{ booking.user.emergency_phone or "N/A" }}
                         </td>
                         <td>
-                            <span class="badge badge-active">Active</span>
+                            {% if booking.status == 'booked' %}
+                                <span class="badge badge-active">Active</span>
+                            {% elif booking.status == 'cancelled' %}
+                                <span class="badge badge-blacklisted">Cancelled</span>
+                            {% else %}
+                                <span class="badge badge-approved">Completed</span>
+                            {% endif %}
                         </td>
                         <td>
+                            {% if booking.status == 'booked' %}
                             <form action="{{ url_for('staff_cancel_participant', booking_id=booking.id) }}" method="POST" style="margin: 0;">
                                 <button type="submit" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="return confirm('Are you sure you want to cancel this booking? This will reopen a slot.');">Cancel</button>
                             </form>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -59,5 +62,4 @@
         {% else %}
         <p style="color: var(--secondary-color); text-align: center; padding: 2rem 0;">No active participants found across your assigned treks.</p>
         {% endif %}
-    </div>
 {% endblock %}

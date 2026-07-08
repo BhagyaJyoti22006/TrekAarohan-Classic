@@ -1,0 +1,145 @@
+{% extends "staff_base.html" %}
+{% set active_page = "treks" %}
+
+{% block dashboard_content %}
+    <a href="{{ url_for('staff_treks') }}" style="color: var(--secondary-color); text-decoration: none; display: inline-block; margin-bottom: 1rem;">&larr; Back to My Treks</a>
+    
+    <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 2rem;">
+        {% if trek.cover_image %}
+            <div style="height: 300px; background-image: url('{{ url_for('static', filename='uploads/' ~ trek.cover_image) }}'); background-size: cover; background-position: center;"></div>
+        {% else %}
+            <div style="height: 300px; background-image: url('{{ url_for('static', filename='images/trek.jpg') }}'); background-size: cover; background-position: center;"></div>
+        {% endif %}
+        
+        <div style="padding: 2.5rem;">
+            <!-- Header & Price -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <h1 style="margin: 0; color: var(--text-color); font-size: 2.5rem;">{{ trek.name }}</h1>
+                <h2 style="margin: 0; color: var(--primary-color); font-size: 2rem;">₹{{ "%.2f"|format(trek.price) }}</h2>
+            </div>
+            
+            <!-- Badges -->
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+                <span class="badge badge-active" style="font-size: 1rem; padding: 0.5rem 1rem; background-color: var(--primary-color); color: white;">{{ trek.difficulty|capitalize }} Difficulty</span>
+                <span class="badge badge-open" style="font-size: 1rem; padding: 0.5rem 1rem;">📍 {{ trek.location }}</span>
+                <span class="badge badge-open" style="font-size: 1rem; padding: 0.5rem 1rem;">🧑‍🤝‍🧑 {{ trek.slots_available }} Slots Left</span>
+                <span class="badge badge-{{ trek.status }}" style="font-size: 1rem; padding: 0.5rem 1rem; margin-left: auto;">{{ trek.status|capitalize }}</span>
+            </div>
+            
+            <!-- Dates Row -->
+            <div style="display: flex; gap: 4rem; margin-bottom: 2.5rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border-color);">
+                <div>
+                    <strong style="color: var(--secondary-color); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Start Date</strong>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; font-weight: 500;">{{ trek.start_date.strftime("%B %d, %Y") }}</p>
+                </div>
+                <div>
+                    <strong style="color: var(--secondary-color); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">End Date</strong>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; font-weight: 500;">{{ trek.end_date.strftime("%B %d, %Y") }}</p>
+                </div>
+                <div>
+                    <strong style="color: var(--secondary-color); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Duration</strong>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; font-weight: 500;">{{ (trek.end_date - trek.start_date).days + 1 }} Days</p>
+                </div>
+                <div>
+                    <strong style="color: var(--secondary-color); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Total Participants</strong>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; font-weight: 500;">{{ bookings | selectattr("status", "equalto", "booked") | list | length }}</p>
+                </div>
+            </div>
+            
+            <!-- Description & Management Grid -->
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 3rem;">
+                <div>
+                    <h3 style="margin-top: 0; font-size: 1.5rem;">About This Trek</h3>
+                    {% if trek.description %}
+                        <div style="line-height: 1.8; color: var(--text-color); font-size: 1.05rem; white-space: pre-wrap;">{{ trek.description }}</div>
+                    {% else %}
+                        <div style="line-height: 1.8; color: #9ca3af; font-style: italic; font-size: 1.05rem;">No description provided.</div>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    <div class="card" style="padding: 1.5rem; background-color: #f8fafc; border: 1px solid #e2e8f0; box-shadow: none;">
+                        <h3 style="margin-top: 0; font-size: 1.2rem; margin-bottom: 1.5rem; color: var(--primary-color);">Management Tools</h3>
+                        <form action="{{ url_for('staff_trek_manage', trek_id=trek.id) }}" method="POST">
+                            <div class="form-group">
+                                <label for="slots_available" class="form-label">Slots Available</label>
+                                <input type="number" id="slots_available" name="slots_available" class="form-control" value="{{ trek.slots_available }}" min="0" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="status" class="form-label">Trek Status</label>
+                                <select name="status" id="status" class="form-control">
+                                    <option value="open" {% if trek.status == 'open' %}selected{% endif %}>Open</option>
+                                    <option value="full" {% if trek.status == 'full' %}selected{% endif %}>Full</option>
+                                    <option value="ongoing" {% if trek.status == 'ongoing' %}selected{% endif %}>Ongoing</option>
+                                    <option value="completed" {% if trek.status == 'completed' %}selected{% endif %}>Completed</option>
+                                    <option value="cancelled" {% if trek.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                                </select>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-accent" style="width: 100%; margin-top: 1rem; padding: 0.75rem;">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top: 0; margin-bottom: 1.5rem; color: var(--text-color); border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">Participant Roster</h3>
+        
+        {% if bookings %}
+        <div class="data-table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Trekker</th>
+                        <th>Contact</th>
+                        <th>Emergency</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>#{{ booking.id }}</td>
+                        <td>
+                            <strong>{{ booking.user.name }}</strong><br>
+                            <span style="font-size: 0.85rem; color: var(--secondary-color);">{{ booking.user.username }}</span>
+                        </td>
+                        <td>
+                            {{ booking.user.email }}<br>
+                            {{ booking.user.phone or "N/A" }}
+                        </td>
+                        <td>
+                            {{ booking.user.emergency_relation or "N/A" }}<br>
+                            {{ booking.user.emergency_phone or "N/A" }}
+                        </td>
+                        <td>
+                            {% if booking.status == 'booked' %}
+                                <span class="badge badge-active">Active</span>
+                            {% elif booking.status == 'cancelled' %}
+                                <span class="badge badge-blacklisted">Cancelled</span>
+                            {% else %}
+                                <span class="badge badge-approved">Completed</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if booking.status == 'booked' %}
+                            <form action="{{ url_for('staff_cancel_participant', booking_id=booking.id) }}" method="POST" style="margin: 0;">
+                                <button type="submit" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="return confirm('Are you sure you want to cancel this booking? This will reopen a slot.');">Cancel</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p style="color: var(--secondary-color); text-align: center; padding: 2rem 0;">No active participants found for this trek.</p>
+        {% endif %}
+    </div>
+{% endblock %}
