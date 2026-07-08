@@ -273,7 +273,13 @@ def create_app():
     def trekker_dashboard():
         if current_user.role != 0:
             return redirect(url_for("home"))
-        return render_template("trekker_dashboard.html")
+        bookings = Booking.query.filter_by(user_id=current_user.id).all()
+        booked_trek_ids = [b.trek_id for b in bookings if b.status == "booked"]
+        if booked_trek_ids:
+            available_treks = Trek.query.filter(Trek.status == "open", ~Trek.id.in_(booked_trek_ids)).all()
+        else:
+            available_treks = Trek.query.filter_by(status="open").all()
+        return render_template("trekker_dashboard.html", bookings=bookings, available_treks=available_treks)
     
     @app.route("/trekker/bookings")
     @login_required
