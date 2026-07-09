@@ -303,7 +303,10 @@ def create_app():
     @app.route("/admin/bookings")
     @login_required
     def admin_bookings():
-        return render_template("admin_bookings.html")
+        if current_user.role != 2:
+            return redirect(url_for("home"))
+        bookings = Booking.query.order_by(Booking.booking_date.desc()).all()
+        return render_template("admin_bookings.html", bookings=bookings)
     
     @app.route("/admin/cancel_booking/<int:booking_id>", methods=["POST"])
     @login_required
@@ -313,12 +316,13 @@ def create_app():
         booking = Booking.query.filter_by(id=booking_id, status="booked").first_or_404()
         trek = booking.trek
         booking.status = "cancelled"
+        booking.cancelled_date = datetime.utcnow()
         trek.slots_available += 1
         if trek.status == "full":
             trek.status = "open"
         db.session.commit()
         flash("Booking cancelled successfully. Slot reopened.", "success")
-        return redirect(url_for("admin_treks_edit", id=trek.id))
+        return redirect(request.referrer or url_for("admin_treks_edit", id=trek.id))
     
     
     # Staff Dashboard

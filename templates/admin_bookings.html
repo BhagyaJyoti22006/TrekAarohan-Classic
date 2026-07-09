@@ -2,9 +2,82 @@
 {% set active_page = "bookings" %}
 
 {% block dashboard_content %}
-    <h2>Manage Bookings</h2>
-    <div class="card" style="margin-top: 2rem;">
-        <h4>Global Bookings Placeholder</h4>
-        <p>This is where the admin can view every booking made across the platform.</p>
-    </div>
+    <h2 style="margin: 0; color: var(--primary-color);">Manage Bookings</h2>
+
+    {% if bookings %}
+    <div class="data-table-wrapper" style="margin-top: 2rem;">
+        <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Trek</th>
+                        <th>Trekker</th>
+                        <th>Contact</th>
+                        <th>Emergency</th>
+                        <th>Booking Date</th>
+                        <th>Cancelled Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>#{{ booking.id }}</td>
+                        <td>
+                            <strong>{{ booking.trek.name }}</strong><br>
+                            <span style="color: var(--secondary-color);">{{ booking.trek.start_date.strftime("%b %d, %Y") }}</span>
+                        </td>
+                        <td>
+                            <strong>{{ booking.user.name }}</strong><br>
+                            <span style="font-size: 0.85rem; color: var(--secondary-color);">{{ booking.user.username }}</span>
+                        </td>
+                        <td>
+                            {{ booking.user.email }}<br>
+                            {{ booking.user.phone or "N/A" }}
+                        </td>
+                        <td>
+                            {% if not booking.user.emergency_phone and not booking.user.emergency_relation %}
+                                <span style="color: var(--secondary-color);">N/A</span>
+                            {% else %}
+                                {{ booking.user.emergency_relation or "N/A" }}<br>
+                                {{ booking.user.emergency_phone or "N/A" }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ booking.booking_date.strftime("%b %d, %Y") }}<br>
+                            <span style="color: var(--secondary-color); font-size: 0.85rem;">{{ booking.booking_date.strftime("%H:%M") }}</span>
+                        </td>
+                        <td>
+                            {% if booking.cancelled_date %}
+                                {{ booking.cancelled_date.strftime("%b %d, %Y") }}<br>
+                                <span style="color: var(--secondary-color); font-size: 0.85rem;">{{ booking.cancelled_date.strftime("%H:%M") }}</span>
+                            {% else %}
+                                <span style="color: var(--secondary-color);">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if booking.status == 'booked' %}
+                                <span class="badge badge-active">Active</span>
+                            {% elif booking.status == 'cancelled' %}
+                                <span class="badge badge-blacklisted">Cancelled</span>
+                            {% else %}
+                                <span class="badge badge-approved">Completed</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if booking.status == 'booked' %}
+                            <form action="{{ url_for('admin_cancel_participant', booking_id=booking.id) }}" method="POST" style="margin: 0;">
+                                <button type="submit" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="return confirm('Are you sure you want to cancel this booking? This will reopen a slot.');">Cancel</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p style="color: var(--secondary-color); text-align: center; padding: 2rem 0;">No bookings found across the platform.</p>
+        {% endif %}
 {% endblock %}
