@@ -97,8 +97,26 @@ def create_app():
         bookings = Booking.query.filter_by(status='booked').count()
         users = User.query.filter(User.role.in_([0, 1])).count()
         pendings = User.query.filter_by(role=1, is_approved=False).count()
-        all_users = User.query.order_by(User.id.desc()).all()
-        return render_template("admin_dashboard.html", total_treks=treks, total_bookings=bookings, total_users=users, pending_staffs=pendings, all_users=all_users)
+        q = request.args.get("q", "").strip()
+        role = request.args.get("role", "")
+        status = request.args.get("status", "")
+        query = User.query
+        if q:
+            if q.isdigit():
+                query = query.filter(db.or_(User.id == int(q), User.name.ilike(f"%{q}%"), User.username.ilike(f"%{q}%")))
+            else:
+                query = query.filter(db.or_(User.name.ilike(f"%{q}%"), User.username.ilike(f"%{q}%")))
+        if role and role.isdigit():
+            query = query.filter(User.role == int(role))
+        if status:
+            if status == "blacklisted":
+                query = query.filter(User.is_blacklisted == True)
+            elif status == "pending":
+                query = query.filter(User.is_blacklisted == False, User.role == 1, User.is_approved == False)
+            elif status == "active":
+                query = query.filter(User.is_blacklisted == False, db.or_(User.role != 1, User.is_approved == True))
+        all_users = query.order_by(User.id.desc()).all()
+        return render_template("admin_dashboard.html", total_treks=treks, total_bookings=bookings, total_users=users, pending_staffs=pendings, all_users=all_users, current_q=q, current_role=role, current_status=status)
     
     @app.route("/admin/treks")
     @login_required
