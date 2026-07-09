@@ -25,15 +25,15 @@
         {% set valid_bookings = bookings|selectattr("status", "equalto", "booked")|list %}
         {% set upcoming_treks = valid_bookings|selectattr("trek.status", "in", ["open", "full", "ongoing"])|list %}
 		{% set completed_treks = valid_bookings|selectattr("trek.status", "equalto", "completed")|list %}
-        <div class="card" style="text-align: center;">
+        <div class="card" style="text-align: center; border-top: 4px solid var(--accent-color);">
             <h3 style="color: var(--secondary-color); font-size: 1rem; margin-top: 0;">Upcoming Treks</h3>
             <p style="font-size: 2.5rem; font-weight: bold; margin: 0; color: var(--accent-color);">{{ upcoming_treks|length }}</p>
         </div>
-        <div class="card" style="text-align: center;">
+        <div class="card" style="text-align: center; border-top: 4px solid var(--primary-color);">
             <h3 style="color: var(--secondary-color); font-size: 1rem; margin-top: 0;">Completed Treks</h3>
             <p style="font-size: 2.5rem; font-weight: bold; margin: 0; color: var(--primary-color);">{{ completed_treks|length }}</p>
         </div>
-        <div class="card" style="text-align: center;">
+        <div class="card" style="text-align: center; border-top: 4px solid var(--text-color);">
             <h3 style="color: var(--secondary-color); font-size: 1rem; margin-top: 0;">Total Bookings</h3>
             <p style="font-size: 2.5rem; font-weight: bold; margin: 0; color: var(--text-color);">{{ valid_bookings|length }}</p>
         </div>

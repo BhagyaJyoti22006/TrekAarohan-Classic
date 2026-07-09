@@ -239,12 +239,14 @@ def create_app():
         assigned_staff = User.query.get(trek.assigned_staff_id)
         if assigned_staff not in staff:
             staff.append(assigned_staff)
-        bookings = Booking.query.filter_by(trek_id=trek.id).all()
+        bookings = Booking.query.filter_by(trek_id=trek.id).order_by(Booking.booking_date.desc()).all()
         return render_template("admin_trek_form.html", trek=trek, staff=staff, bookings=bookings)
     
     @app.route("/admin/staffs")
     @login_required
     def admin_staffs():
+        if current_user.role != 2:
+            return redirect(url_for("home"))
         staffs = User.query.filter_by(role=1).all()
         return render_template("admin_staffs.html", staffs=staffs)
     
@@ -278,6 +280,8 @@ def create_app():
     @app.route("/admin/trekkers")
     @login_required
     def admin_trekkers():
+        if current_user.role != 2:
+            return redirect(url_for("home"))
         trekkers = User.query.filter_by(role=0).all()
         return render_template("admin_trekkers.html", trekkers=trekkers)
     
@@ -313,8 +317,14 @@ def create_app():
     def admin_cancel_participant(booking_id):
         if current_user.role != 2:
             return redirect(url_for("home"))
-        booking = Booking.query.filter_by(id=booking_id, status="booked").first_or_404()
+        booking = Booking.query.get_or_404(booking_id)
         trek = booking.trek
+        if booking.status != "booked":
+            flash("This booking cannot be cancelled.", "error")
+            return redirect(url_for("admin_bookings"))
+        if trek.status in ["completed", "cancelled"]:
+            flash("You cannot cancel a booking for a trek that has already concluded.", "error")
+            return redirect(url_for("admin_bookings"))
         booking.status = "cancelled"
         booking.cancelled_date = datetime.utcnow()
         trek.slots_available += 1
@@ -322,7 +332,7 @@ def create_app():
             trek.status = "open"
         db.session.commit()
         flash("Booking cancelled successfully. Slot reopened.", "success")
-        return redirect(request.referrer or url_for("admin_treks_edit", id=trek.id))
+        return redirect(request.referrer or url_for("admin_bookings"))
     
     
     # Staff Dashboard
@@ -360,7 +370,7 @@ def create_app():
         assigned_treks = Trek.query.filter_by(assigned_staff_id=current_user.id).all()
         trek_ids = [t.id for t in assigned_treks]
         if trek_ids:
-            bookings = Booking.query.filter(Booking.trek_id.in_(trek_ids)).all()
+            bookings = Booking.query.filter(Booking.trek_id.in_(trek_ids)).order_by(Booking.booking_date.desc()).all()
         else:
             bookings = []
         return render_template("staff_participants.html", bookings=bookings)
@@ -418,7 +428,7 @@ def create_app():
             db.session.commit()
             flash("Trek updated successfully.", "success")
             return redirect(url_for("staff_trek_manage", trek_id=trek.id))
-        bookings = Booking.query.filter_by(trek_id=trek.id).all()
+        bookings = Booking.query.filter_by(trek_id=trek.id).order_by(Booking.booking_date.desc()).all()
         return render_template("staff_trek_manage.html", trek=trek, bookings=bookings)
     
     @app.route("/staff/cancel_booking/<int:booking_id>", methods=["POST"])
@@ -426,18 +436,25 @@ def create_app():
     def staff_cancel_participant(booking_id):
         if current_user.role != 1 or not current_user.is_approved:
             return redirect(url_for("home"))
-        booking = Booking.query.filter_by(id=booking_id, status="booked").first_or_404()
+        booking = Booking.query.get_or_404(booking_id)
         trek = booking.trek
         if trek.assigned_staff_id != current_user.id:
             flash("You do not have permission to manage this booking.", "error")
             return redirect(url_for("staff_participants"))
+        if booking.status != "booked":
+            flash("This booking cannot be cancelled.", "error")
+            return redirect(url_for("staff_participants"))
+        if trek.status in ["completed", "cancelled"]:
+            flash("You cannot cancel a booking for a trek that has already concluded.", "error")
+            return redirect(url_for("staff_participants"))
         booking.status = "cancelled"
+        booking.cancelled_date = datetime.utcnow()
         trek.slots_available += 1
         if trek.status == "full":
             trek.status = "open"
         db.session.commit()
         flash("Booking cancelled successfully. Slot reopened.", "success")
-        return redirect(url_for("staff_participants"))
+        return redirect(request.referrer or url_for("staff_participants"))
     
     
     # Trekker Dashboard
@@ -459,7 +476,7 @@ def create_app():
     def trekker_bookings():
         if current_user.role != 0:
             return redirect(url_for("home"))
-        active_bookings = Booking.query.filter_by(user_id=current_user.id, status="booked").all()
+        active_bookings = Booking.query.filter_by(user_id=current_user.id, status="booked").order_by(Booking.booking_date.desc()).all()
         return render_template("trekker_bookings.html", bookings=active_bookings)
     
     @app.route("/trekker/history")
@@ -532,18 +549,18 @@ def create_app():
         if current_user.role != 0:
             return redirect(url_for("home"))
         booking = Booking.query.get_or_404(booking_id)
+        trek = booking.trek
         if booking.user_id != current_user.id:
             flash("You do not have permission to cancel this booking.", "error")
             return redirect(url_for("trekker_bookings"))
         if booking.status != "booked":
             flash("This booking cannot be cancelled.", "error")
             return redirect(url_for("trekker_bookings"))
-        if booking.trek.status in ["completed", "cancelled"]:
+        if trek.status in ["completed", "cancelled"]:
             flash("You cannot cancel a booking for a trek that has already concluded.", "error")
             return redirect(url_for("trekker_bookings"))
         booking.status = "cancelled"
         booking.cancelled_date = datetime.utcnow()
-        trek = booking.trek
         trek.slots_available += 1
         if trek.status == "full":
             trek.status = "open"
