@@ -22,7 +22,7 @@
 
     <!-- Quick Stats -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 2rem; margin-bottom: 3rem;">
-        {% set valid_bookings = bookings|selectattr("status", "equalto", "booked")|list %}
+        {% set valid_bookings = bookings|selectattr("status", "in", ["booked", "completed"])|list %}
         {% set upcoming_treks = valid_bookings|selectattr("trek.status", "in", ["open", "full", "ongoing"])|list %}
 		{% set completed_treks = valid_bookings|selectattr("trek.status", "equalto", "completed")|list %}
         <div class="card" style="text-align: center; border-top: 4px solid var(--accent-color);">

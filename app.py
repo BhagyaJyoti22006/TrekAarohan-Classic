@@ -94,7 +94,7 @@ def create_app():
         if current_user.role != 2:
             return redirect(url_for("home"))
         treks = Trek.query.count()
-        bookings = Booking.query.filter_by(status='booked').count()
+        bookings = Booking.query.filter_by(status="booked").count()
         users = User.query.filter(User.role.in_([0, 1])).count()
         pendings = User.query.filter_by(role=1, is_approved=False).count()
         q = request.args.get("q", "").strip()
@@ -194,6 +194,9 @@ def create_app():
             return redirect(url_for("home"))
         trek = Trek.query.get_or_404(id)
         if request.method == "POST":
+            if trek.status in ["completed", "cancelled"]:
+                flash("This trek has concluded and cannot be edited.", "error")
+                return redirect(url_for("admin_treks_edit", id=trek.id))
             trek.name = request.form.get("name")
             trek.location = request.form.get("location")
             trek.description = request.form.get("description")
@@ -215,6 +218,15 @@ def create_app():
                 else:
                     trek.status = new_status
                     trek.slots_available = slots_available
+                if new_status == "cancelled":
+                    active_bookings = Booking.query.filter_by(trek_id=trek.id, status="booked").all()
+                    for b in active_bookings:
+                        b.status = "cancelled"
+                        b.cancelled_date = datetime.utcnow()
+                elif new_status == "completed":
+                    active_bookings = Booking.query.filter_by(trek_id=trek.id, status="booked").all()
+                    for b in active_bookings:
+                        b.status = "completed"
             else:
                 flash("Invalid status.", "error")
                 return redirect(request.url)
@@ -415,11 +427,23 @@ def create_app():
             flash("You do not have permission to manage this trek.", "error")
             return redirect(url_for("staff_treks"))
         if request.method == "POST":
+            if trek.status in ["completed", "cancelled"]:
+                flash("This trek has concluded and cannot be managed.", "error")
+                return redirect(url_for("staff_trek_manage", trek_id=trek.id))
             new_status = request.form.get("status")
             new_slots = request.form.get("slots_available")
             valid_statuses = ["open", "full", "ongoing", "completed", "cancelled"]
             if new_status in valid_statuses:
                 trek.status = new_status
+                if new_status == "cancelled":
+                    active_bookings = Booking.query.filter_by(trek_id=trek.id, status="booked").all()
+                    for b in active_bookings:
+                        b.status = "cancelled"
+                        b.cancelled_date = datetime.utcnow()
+                elif new_status == "completed":
+                    active_bookings = Booking.query.filter_by(trek_id=trek.id, status="booked").all()
+                    for b in active_bookings:
+                        b.status = "completed"
             if new_slots is not None:
                 try:
                     trek.slots_available = int(new_slots)

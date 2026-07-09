@@ -71,7 +71,11 @@
                         <span class="badge badge-{{ trek.status }}">{{ trek.status|capitalize }}</span>
                     </td>
                     <td>
+                        {% if trek.status in ["completed", "cancelled"] %}
+                        <a href="{{ url_for('admin_treks_edit', id=trek.id) }}" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin-right: 0.25rem;">View</a>
+                        {% else %}
                         <a href="{{ url_for('admin_treks_edit', id=trek.id) }}" class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin-right: 0.25rem;">Edit</a>
+                        {% endif %}
                         <a href="{{ url_for('public_trek_detail', id=trek.id) }}" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">Show</a>
                     </td>
                 </tr>

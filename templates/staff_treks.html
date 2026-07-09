@@ -25,9 +25,13 @@
                     <td>{{ trek.start_date.strftime("%b %d, %Y") }} - {{ trek.end_date.strftime("%b %d, %Y") }}</td>
                     <td><span class="badge badge-{{ trek.status }}">{{ trek.status|capitalize }}</span></td>
                     <td>{{ trek.slots_available }}</td>
-                    <td>{{ trek.bookings | selectattr("status", "equalto", "booked") | list | length }}</td>
+                    <td>{{ trek.bookings | selectattr("status", "in", ["booked", "completed"]) | list | length }}</td>
                     <td>
+                        {% if trek.status in ["completed", "cancelled"] %}
+                        <a href="{{ url_for('staff_trek_manage', trek_id=trek.id) }}" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">View</a>
+                        {% else %}
                         <a href="{{ url_for('staff_trek_manage', trek_id=trek.id) }}" class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">Manage</a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% else %}
