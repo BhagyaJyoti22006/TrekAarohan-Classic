@@ -508,7 +508,11 @@ def create_app():
     def trekker_history():
         if current_user.role != 0:
             return redirect(url_for("home"))
-        return render_template("trekker_history.html")
+        historical_bookings = Booking.query.filter(
+            Booking.user_id == current_user.id,
+            Booking.status.in_(["completed", "cancelled"])
+        ).order_by(Booking.booking_date.desc()).all()
+        return render_template("trekker_history.html", bookings=historical_bookings)
     
     @app.route("/trekker/profile", methods=["GET", "POST"])
     @login_required

@@ -3,8 +3,58 @@
 
 {% block dashboard_content %}
     <h2>Trek History</h2>
-    <div class="card" style="margin-top: 2rem;">
-        <h4>Past Treks Placeholder</h4>
-        <p>This is where you will see a record of your completed and cancelled treks.</p>
-    </div>
+    {% if bookings %}
+        <div class="card" style="margin-top: 2rem; padding: 0;">
+            <div class="data-table-wrapper" style="box-shadow: none;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Trek Name</th>
+                            <th>Location</th>
+                            <th>Trek Dates</th>
+                            <th>Status</th>
+                            <th>Details</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                        <tr>
+                            <td>#{{ booking.id }}</td>
+                            <td>
+                                <strong>{{ booking.trek.name }}</strong>
+                            </td>
+                            <td>{{ booking.trek.location }}</td>
+                            <td>{{ booking.trek.start_date.strftime('%b %d, %Y') }} to <br> {{ booking.trek.end_date.strftime('%b %d, %Y') }}</td>
+                            <td>
+                                {% if booking.status == 'completed' %}
+                                    <span class="badge badge-approved">Completed</span>
+                                {% else %}
+                                    <span class="badge badge-blacklisted">Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if booking.status == 'completed' %}
+                                    <span style="color: var(--secondary-color); font-size: 0.9rem;">Booked: {{ booking.booking_date.strftime('%b %d, %Y') }}</span>
+                                {% else %}
+                                    <span style="color: var(--secondary-color); font-size: 0.9rem;">Booked: {{ booking.booking_date.strftime('%b %d, %Y') }}</span><br>
+                                    <span style="color: var(--danger-color); font-size: 0.9rem;">Cancelled: {{ booking.cancelled_date.strftime('%b %d, %Y') if booking.cancelled_date else booking.booking_date.strftime('%b %d, %Y') }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('public_trek_detail', id=booking.trek.id) }}" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">View Trek</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="card" style="margin-top: 2rem; text-align: center; padding: 3rem;">
+            <h3 style="margin-top: 0; color: var(--text-color);">No Historical Bookings</h3>
+            <p style="color: var(--secondary-color); margin-bottom: 0;">You don't have any completed or cancelled treks yet.</p>
+        </div>
+    {% endif %}
 {% endblock %}
