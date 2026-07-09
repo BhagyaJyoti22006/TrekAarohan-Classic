@@ -39,16 +39,35 @@
         </div>
     </div>
     
-    <!-- Top 4 Recommendations -->
+    <!-- Available Treks -->
     <div style="margin-bottom: 3rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
-            <h2 style="margin: 0; font-size: 1.5rem;">Recommended For You</h2>
-            <a href="{{ url_for('public_treks') }}" style="color: var(--primary-color); text-decoration: none; font-weight: 500;">View All Treks &rarr;</a>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2 style="margin: 0; font-size: 1.5rem;">Available Treks</h2>
         </div>
+        
+        <!-- Search and Filter Form -->
+        <form method="GET" action="{{ url_for('trekker_dashboard') }}" style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2.5rem; background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <div style="flex: 1; min-width: 200px;">
+                <input type="text" name="q" value="{{ current_q }}" class="form-control" placeholder="Search by trek name or location..." style="height: 100%; margin: 0;">
+            </div>
+            <div style="width: 150px;">
+                <input type="number" name="max_price" value="{{ current_max_price }}" class="form-control" placeholder="Max Price (₹)" style="height: 100%; margin: 0;" min="0" step="1">
+            </div>
+            <div style="width: 180px;">
+                <select name="difficulty" class="form-control" style="height: 100%; margin: 0;">
+                    <option value="">All Difficulties</option>
+                    <option value="easy" {% if current_difficulty == 'easy' %}selected{% endif %}>Easy</option>
+                    <option value="medium" {% if current_difficulty == 'medium' %}selected{% endif %}>Medium</option>
+                    <option value="hard" {% if current_difficulty == 'hard' %}selected{% endif %}>Hard</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin: 0;">Search</button>
+            <a href="{{ url_for('trekker_dashboard') }}" class="btn btn-secondary" style="display: flex; align-items: center; justify-content: center; margin: 0;">Clear</a>
+        </form>
         
         {% if available_treks %}
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2.5rem;">
-            {% for t in available_treks[:4] %}
+            {% for t in available_treks %}
             <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); transition: transform 0.2s;">
                 {% if t.cover_image %}
                     <div style="height: 200px; background-image: url('{{ url_for('static', filename='uploads/' ~ t.cover_image) }}'); background-size: cover; background-position: center;"></div>

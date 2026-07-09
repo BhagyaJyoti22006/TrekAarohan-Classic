@@ -487,13 +487,25 @@ def create_app():
     def trekker_dashboard():
         if current_user.role != 0:
             return redirect(url_for("home"))
-        bookings = Booking.query.filter_by(user_id=current_user.id).all()
+        bookings = Booking.query.filter_by(user_id=current_user.id).order_by(Booking.booking_date.desc()).all()
         booked_trek_ids = [b.trek_id for b in bookings if b.status == "booked"]
+        q = request.args.get("q", "").strip()
+        difficulty = request.args.get("difficulty", "")
+        max_price = request.args.get("max_price", "").strip()
+        query = Trek.query.filter(Trek.status == "open")
         if booked_trek_ids:
-            available_treks = Trek.query.filter(Trek.status == "open", ~Trek.id.in_(booked_trek_ids)).all()
-        else:
-            available_treks = Trek.query.filter_by(status="open").all()
-        return render_template("trekker_dashboard.html", bookings=bookings, available_treks=available_treks)
+            query = query.filter(~Trek.id.in_(booked_trek_ids))
+        if q:
+            query = query.filter(db.or_(Trek.name.ilike(f"%{q}%"), Trek.location.ilike(f"%{q}%")))
+        if difficulty:
+            query = query.filter(Trek.difficulty == difficulty)
+        if max_price:
+            try:
+                query = query.filter(Trek.price <= float(max_price))
+            except ValueError:
+                pass
+        available_treks = query.order_by(Trek.start_date.asc()).all()
+        return render_template("trekker_dashboard.html", bookings=bookings, available_treks=available_treks, current_q=q, current_difficulty=difficulty, current_max_price=max_price)
     
     @app.route("/trekker/bookings")
     @login_required

@@ -23,6 +23,7 @@
             <button type="submit" class="btn btn-primary">Search</button>
             <a href="{{ url_for('public_treks') }}" class="btn btn-secondary" style="display: flex; align-items: center; justify-content: center;">Clear</a>
         </form>
+		
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2.5rem;">
             {% for trek in treks %}
             <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); transition: transform 0.2s;">
