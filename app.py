@@ -239,7 +239,8 @@ def create_app():
         assigned_staff = User.query.get(trek.assigned_staff_id)
         if assigned_staff not in staff:
             staff.append(assigned_staff)
-        return render_template("admin_trek_form.html", trek=trek, staff=staff)
+        bookings = Booking.query.filter_by(trek_id=trek.id).all()
+        return render_template("admin_trek_form.html", trek=trek, staff=staff, bookings=bookings)
     
     @app.route("/admin/staffs")
     @login_required
@@ -303,6 +304,21 @@ def create_app():
     @login_required
     def admin_bookings():
         return render_template("admin_bookings.html")
+    
+    @app.route("/admin/cancel_booking/<int:booking_id>", methods=["POST"])
+    @login_required
+    def admin_cancel_participant(booking_id):
+        if current_user.role != 2:
+            return redirect(url_for("home"))
+        booking = Booking.query.filter_by(id=booking_id, status="booked").first_or_404()
+        trek = booking.trek
+        booking.status = "cancelled"
+        trek.slots_available += 1
+        if trek.status == "full":
+            trek.status = "open"
+        db.session.commit()
+        flash("Booking cancelled successfully. Slot reopened.", "success")
+        return redirect(url_for("admin_treks_edit", id=trek.id))
     
     
     # Staff Dashboard

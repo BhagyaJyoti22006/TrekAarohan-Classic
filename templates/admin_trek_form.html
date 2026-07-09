@@ -101,4 +101,78 @@
         </div>
     </form>
 </div>
+
+{% if trek %}
+    <div class="card" style="max-width: 800px; margin: 2rem auto 0 auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
+            <h3 style="margin: 0; color: var(--text-color);">Participant Roster</h3>
+            {% set booked_count = bookings | selectattr('status', 'equalto', 'booked') | list | length %}
+            {% set total_slots = booked_count + trek.slots_available %}
+            {% if trek.slots_available == 0 %}
+                <span class="badge" style="font-size: 1rem; padding: 0.5rem 1rem; background-color: var(--accent-color); color: white; border: 1px solid var(--accent-color);">
+                    All {{ total_slots }} Slots Booked
+                </span>
+            {% else %}
+                <span class="badge" style="font-size: 1rem; padding: 0.5rem 1rem; background-color: #FEF3C7; color: var(--accent-color); border: 1px solid var(--accent-color);">
+                    {{ booked_count }} / {{ total_slots }} Slots Booked
+                </span>
+            {% endif %}
+        </div>
+        
+        {% if bookings %}
+        <div class="data-table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Trekker</th>
+                        <th>Contact</th>
+                        <th>Emergency</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>#{{ booking.id }}</td>
+                        <td>
+                            <strong>{{ booking.user.name }}</strong><br>
+                            <span style="font-size: 0.85rem; color: var(--secondary-color);">{{ booking.user.username }}</span>
+                        </td>
+                        <td>
+                            {{ booking.user.email }}<br>
+                            {{ booking.user.phone or "N/A" }}
+                        </td>
+                        <td>
+                            {{ booking.user.emergency_relation or "N/A" }}<br>
+                            {{ booking.user.emergency_phone or "N/A" }}
+                        </td>
+                        <td>
+                            {% if booking.status == 'booked' %}
+                                <span class="badge badge-active">Active</span>
+                            {% elif booking.status == 'cancelled' %}
+                                <span class="badge badge-blacklisted">Cancelled</span>
+                            {% else %}
+                                <span class="badge badge-approved">Completed</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if booking.status == 'booked' %}
+                            <form action="{{ url_for('admin_cancel_participant', booking_id=booking.id) }}" method="POST" style="margin: 0;">
+                                <button type="submit" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="return confirm('Are you sure you want to cancel this booking? This will reopen a slot.');">Cancel</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p style="color: var(--secondary-color); text-align: center; padding: 2rem 0;">No active participants found for this trek.</p>
+        {% endif %}
+    </div>
+{% endif %}
+
 {% endblock %}
