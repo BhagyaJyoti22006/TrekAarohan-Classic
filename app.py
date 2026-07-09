@@ -91,7 +91,13 @@ def create_app():
     @app.route("/admin/dashboard")
     @login_required
     def admin_dashboard():
-        return render_template("admin_dashboard.html")
+        if current_user.role != 2:
+            return redirect(url_for("home"))
+        treks = Trek.query.count()
+        bookings = Booking.query.filter_by(status='booked').count()
+        users = User.query.filter(User.role.in_([0, 1])).count()
+        pendings = User.query.filter_by(role=1, is_approved=False).count()
+        return render_template("admin_dashboard.html", total_treks=treks, total_bookings=bookings, total_users=users, pending_staffs=pendings)
     
     @app.route("/admin/treks")
     @login_required
