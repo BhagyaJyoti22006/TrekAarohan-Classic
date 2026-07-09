@@ -97,7 +97,8 @@ def create_app():
         bookings = Booking.query.filter_by(status='booked').count()
         users = User.query.filter(User.role.in_([0, 1])).count()
         pendings = User.query.filter_by(role=1, is_approved=False).count()
-        return render_template("admin_dashboard.html", total_treks=treks, total_bookings=bookings, total_users=users, pending_staffs=pendings)
+        all_users = User.query.order_by(User.id.desc()).all()
+        return render_template("admin_dashboard.html", total_treks=treks, total_bookings=bookings, total_users=users, pending_staffs=pendings, all_users=all_users)
     
     @app.route("/admin/treks")
     @login_required

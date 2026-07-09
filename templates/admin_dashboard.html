@@ -23,4 +23,62 @@
             <p style="font-size: 2.5rem; font-weight: bold; margin: 0; color: var(--danger-color);">{{ pending_staffs }}</p>
         </div>
     </div>
+    
+    <!-- Master Users Table -->
+    <h3 style="margin-top: 3rem; margin-bottom: 1rem; color: var(--text-color);">All Users Overview</h3>
+    <div class="data-table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Role</th>
+                    <th>Username</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Emergency Info</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in all_users %}
+                <tr>
+                    <td>#{{ u.id }}</td>
+                    <td>
+                        {% if u.role == 2 %}
+                            <span class="badge badge-special">Admin</span>
+                        {% elif u.role == 1 %}
+                            <span class="badge badge-ongoing">Staff</span>
+                        {% else %}
+                            <span class="badge badge-completed" style="background-color: var(--secondary-color); color: white;">Trekker</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ u.username }}</td>
+                    <td>{{ u.name }}</td>
+                    <td>{{ u.email }}</td>
+                    <td>{{ u.phone if u.phone else "N/A" }}</td>
+                    <td>
+                        {% if not u.emergency_phone and not u.emergency_relation %}
+                            <span style="color: var(--secondary-color);">N/A</span>
+                        {% else %}
+                            Phone: {{ u.emergency_phone if u.emergency_phone else "N/A" }}<br>
+                            Relation: {{ u.emergency_relation if u.emergency_relation else "N/A" }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if u.is_blacklisted %}
+                            <span class="badge badge-blacklisted">Blacklisted</span>
+                        {% elif u.role == 1 and not u.is_approved %}
+                            <span class="badge badge-pending">Pending</span>
+                        {% else %}
+                            <span class="badge badge-active">Active</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="8" style="text-align: center; color: var(--secondary-color);">No users found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
