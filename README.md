@@ -9,6 +9,8 @@ A Trekking Management Application handling trek approvals, staff assignments, an
 - **Role-Based Access Control**: Secure logins using Flask-Login to route users to their dedicated views.
 - **Robust Validation**: Backend constraints to prevent overbooking and invalid data entry.
 
+---
+
 ## Setup Instructions
 
 ### 1. Install Dependencies
@@ -29,8 +31,9 @@ Run the Flask application:
 ```bash
 python app.py
 ```
-The server will start locally. Open your web browser and navigate to:
-**http://127.0.0.1:5000**
+The server will start locally. Open the web browser and navigate to: **http://127.0.0.1:5000**
+
+---
 
 ## Default Admin Account
 
@@ -39,6 +42,8 @@ Once the database is initialized, one can log in using the pre-created Admin acc
 - **Password:** admin123
 
 From the Admin Dashboard, start creating Treks and approving newly registered Trek Staff!
+
+---
 
 ## Architecture
 
@@ -57,6 +62,8 @@ From the Admin Dashboard, start creating Treks and approving newly registered Tr
 | **Vanilla CSS** | Custom frontend styling and finer control over aesthetics. |
 | **SQLite** | Lightweight local database for storing all user, trek, and booking data. |
 | **Werkzeug (Security)** | Used for password hashing and verification to ensure secure user authentication. |
+
+---
 
 ## Author
 
