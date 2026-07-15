@@ -178,7 +178,7 @@ def create_app():
             db.session.flush()  # Flush to generate the trek ID before committing
             file = request.files.get("cover_image")
             if file and file.filename != "":
-                filename = f"{new_trek.id}-{secure_filename(file.filename)}"
+                filename = f"{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
                 file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
                 new_trek.cover_image = filename
             db.session.commit()
@@ -241,7 +241,7 @@ def create_app():
                 return redirect(request.url)
             file = request.files.get("cover_image")
             if file and file.filename != "":
-                filename = f"{trek.id}-{secure_filename(file.filename)}"
+                filename = f"{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
                 file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
                 trek.cover_image = filename
             db.session.commit()
@@ -399,9 +399,18 @@ def create_app():
             emergency_phone = request.form.get("emergency_phone")
             emergency_relation = request.form.get("emergency_relation")
             experience = request.form.get("experience")
+            if not emergency_phone:
+                emergency_phone = None
             if not name or not phone or not email:
                 flash("Name, Email, and Phone number are required.", "error")
             else:
+                try:
+                    int(phone)
+                    if emergency_phone:
+                        int(emergency_phone)
+                except ValueError:
+                    flash("Phone numbers must be valid numbers.", "error")
+                    return redirect(request.url)
                 existing_user = User.query.filter(User.email == email, User.id != current_user.id).first()
                 if existing_user:
                     flash("Email is already registered by another user.", "error")
@@ -537,9 +546,18 @@ def create_app():
             phone = request.form.get("phone")
             emergency_phone = request.form.get("emergency_phone")
             emergency_relation = request.form.get("emergency_relation")
+            if not emergency_phone:
+                emergency_phone = None
             if not name or not phone or not email:
                 flash("Name, Email, and Phone number are required.", "error")
             else:
+                try:
+                    int(phone)
+                    if emergency_phone:
+                        int(emergency_phone)
+                except ValueError:
+                    flash("Phone numbers must be valid numbers.", "error")
+                    return redirect(request.url)
                 existing_user = User.query.filter(User.email == email, User.id != current_user.id).first()
                 if existing_user:
                     flash("Email is already registered by another user.", "error")
@@ -558,7 +576,7 @@ def create_app():
     @login_required
     def book_trek(trek_id):
         if current_user.role != 0:
-            flash("Only trekkers can book treks.", "error")
+            flash("Forbidden. Only trekkers can book treks.", "error")
             return redirect(url_for("public_trek_detail", id=trek_id))
         if current_user.is_blacklisted:
             flash("Your account is suspended. You cannot book new treks.", "error")
@@ -651,6 +669,14 @@ def create_app():
                 role = 0
             if role != 1:
                 role = 0
+            if not username or not email or not password or not name or not phone:
+                flash("Missing required fields.", "error")
+                return redirect(request.url)
+            try:
+                int(phone)
+            except ValueError:
+                flash("Phone number must be a valid number.", "error")
+                return redirect(request.url)
             user_exists = User.query.filter_by(username=username).first()
             email_exists = User.query.filter_by(email=email).first()
             if user_exists:
@@ -672,6 +698,10 @@ def create_app():
                 flash("Registration successful! Please log in.", "success")
                 return redirect(url_for("login"))
         return render_template("register.html")
+    
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template("404.html"), 404
     
     return app
 
