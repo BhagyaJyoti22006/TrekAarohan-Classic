@@ -3,7 +3,7 @@
 
 {% block public_content %}
 <div class="container" style="max-width: 900px; margin: 0 auto; padding: 2rem 1rem 4rem 1rem;">
-    <a href="{{ url_for('home') }}" style="color: var(--secondary-color); text-decoration: none; display: inline-block; margin-bottom: 1rem;">&larr; Back to Treks</a>
+    <a href="{{ url_for('public_treks') }}" style="color: var(--secondary-color); text-decoration: none; display: inline-block; margin-bottom: 1rem;">&larr; Back to Treks</a>
     
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
